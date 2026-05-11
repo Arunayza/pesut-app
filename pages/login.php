@@ -24,6 +24,24 @@ $flash = getFlash();
     <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('pesut-theme') || 'dark');</script>
     <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/style.css?v=<?= filemtime(__DIR__ . '/../assets/css/style.css') ?>">
     <style>
+        /* Override background for Login */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('<?= BASE_URL ?>/assets/hero-bg-2.jpg');
+            background-size: cover;
+            background-position: center top;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            opacity: 0.05;
+            z-index: 0;
+            pointer-events: none;
+        }
+        [data-theme="light"] body::before {
+            filter: invert(1) hue-rotate(180deg);
+        }
+
         /* ===== Login Page Overrides ===== */
 
         /* Logo badge — iOS-style icon, works di dark & light */
