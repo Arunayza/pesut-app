@@ -232,10 +232,10 @@ if ($data['jenis_pengajuan'] === 'izin') {
     $templateProcessor->setValue('alamat_cuti', htmlspecialchars($data['alamat_cuti'] ?? ''));
     $templateProcessor->setValue('telepon', htmlspecialchars($data['telepon'] ?? ''));
 
-    // 3. Saldo Cuti
-    $tahunCuti = date('Y', strtotime($data['tanggal_mulai']));
+    // 3. Saldo Cuti — selalu dari TAHUN_AKTIF
+    $tahunCuti = (int) TAHUN_AKTIF;
     $saldo = cekSisaCuti($data['user_id'], $tahunCuti, $pdo);
-    $tahunN = (int)$tahunCuti;
+    $tahunN = $tahunCuti;
 
     $templateProcessor->setValue('thn_n', $tahunN);
     $templateProcessor->setValue('thn_n1', $tahunN - 1);
@@ -254,16 +254,26 @@ if ($data['jenis_pengajuan'] === 'izin') {
     }
     $sisaSebelumN = max(0, $sisaSebelumN);
 
+    // Jika tahunan_lalu, sisa N-1 SEBELUM dikurangi
+    if ($data['tipe_cuti'] === 'tahunan_lalu') {
+        $sisaSebelumN1 = $sisaN1 + $jumlahHari;
+    } else {
+        $sisaSebelumN1 = $sisaN1;
+    }
+    $sisaSebelumN1 = max(0, $sisaSebelumN1);
+
     $templateProcessor->setValue('sisa_n', $sisaSebelumN);
-    $templateProcessor->setValue('sisa_n1', $sisaN1);
+    $templateProcessor->setValue('sisa_n1', $sisaSebelumN1);
     $templateProcessor->setValue('sisa_n2', '-');
 
     // 4. Checkmark Jenis Cuti & Keterangan (BERBEDA per template)
     if ($isPNSHakim) {
         // === PNSHakim ===
         // Checkmark: k1=Tahunan, k2=Besar, k3=Sakit, k4=Melahirkan, k5=Alasan Penting, k6=Di Luar Tanggungan
+        // tahunan_lalu juga dicentang di k1
         $pnsHakimMap = [
             'tahunan'                  => 'k1',
+            'tahunan_lalu'             => 'k1',
             'besar'                    => 'k2',
             'sakit'                    => 'k3',
             'melahirkan'               => 'k4',
@@ -271,16 +281,22 @@ if ($data['jenis_pengajuan'] === 'izin') {
             'di_luar_tanggungan_negara' => 'k6',
         ];
 
-        foreach ($pnsHakimMap as $jenis => $tag) {
-            $mark = ($data['tipe_cuti'] === $jenis) ? 'V' : '';
-            $templateProcessor->setValue($tag, $mark);
+        foreach (['k1','k2','k3','k4','k5','k6'] as $tag) {
+            $templateProcessor->setValue($tag, '');
+        }
+        $activeTag = $pnsHakimMap[$data['tipe_cuti']] ?? null;
+        if ($activeTag) {
+            $templateProcessor->setValue($activeTag, 'V');
         }
 
         // Keterangan Cuti Tahunan per tahun: ket_th, ket_th1, ket_th2
-        // Format: "diambil X sisa Y hari"
         if ($data['tipe_cuti'] === 'tahunan') {
             $templateProcessor->setValue('ket_th', "diambil {$jumlahHari} sisa {$sisaN} hari");
             $templateProcessor->setValue('ket_th1', '-');
+            $templateProcessor->setValue('ket_th2', '-');
+        } elseif ($data['tipe_cuti'] === 'tahunan_lalu') {
+            $templateProcessor->setValue('ket_th', '-');
+            $templateProcessor->setValue('ket_th1', "diambil {$jumlahHari} sisa {$sisaN1} hari");
             $templateProcessor->setValue('ket_th2', '-');
         } else {
             $templateProcessor->setValue('ket_th', '-');

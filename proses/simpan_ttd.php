@@ -166,15 +166,12 @@ try {
 
         // Update saldo cuti jika cuti disetujui
         if ($pengajuan['jenis_pengajuan'] === 'cuti') {
-            $tahun = (int) date('Y', strtotime($pengajuan['tanggal_mulai']));
+            // Selalu gunakan TAHUN_AKTIF karena 'tahunan_lalu' disimpan
+            // di kolom terpakai_tahunan_lalu pada baris saldo tahun aktif
+            $tahunSaldo = (int) TAHUN_AKTIF;
             $tipeCuti = $pengajuan['tipe_cuti'] ?? 'tahunan';
             
             // Tentukan kolom yang perlu diupdate
-            // Catatan: tipe 'tahunan_lalu' disimpan sebagai 'tahunan' di DB pengajuan
-            // tapi pemotongannya dari kolom terpakai_tahunan_lalu
-            // Cara deteksi: cek apakah alasan berisi 'tahunan_lalu' di catatan log, 
-            // atau cek dari nama kolom — karena DB sudah save sebagai 'tahunan',
-            // kita cek via catatan log aktivitas
             $columnTerpakai = 'terpakai_tahunan';
             if ($tipeCuti === 'sakit') $columnTerpakai = 'terpakai_sakit';
             elseif ($tipeCuti === 'melahirkan') $columnTerpakai = 'terpakai_melahirkan';
@@ -187,10 +184,6 @@ try {
             $logCatatan = $stmtLog->fetchColumn() ?: '';
             if ($tipeCuti === 'tahunan' && strpos($logCatatan, 'tahunan_lalu') !== false) {
                 $columnTerpakai = 'terpakai_tahunan_lalu';
-                // Deduct dari tahun sebelumnya
-                $tahunSaldo = $tahun - 1;
-            } else {
-                $tahunSaldo = $tahun;
             }
 
             $stmt = $pdo->prepare("

@@ -68,8 +68,9 @@ if ($jenis === 'cuti') {
         redirect(BASE_URL . '/pages/form_cuti.php');
     }
 
-    // Cek saldo
-    $tahun = (int) date('Y', strtotime($mulai));
+    // Cek saldo — selalu gunakan TAHUN_AKTIF karena 'tahunan_lalu' disimpan
+    // di kolom jatah_tahunan_lalu pada baris saldo tahun aktif
+    $tahun = (int) TAHUN_AKTIF;
     $saldo = cekSisaCuti($userId, $tahun, $pdo);
     $sisaCuti = 0;
     if ($tipeCuti === 'tahunan') $sisaCuti = max(0, $saldo['jatah_tahunan'] - $saldo['terpakai_tahunan']);

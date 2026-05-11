@@ -65,8 +65,8 @@ if ($overlapData) {
     redirect(BASE_URL . '/pages/form_cuti.php');
 }
 
-// Cek sisa cuti berdasarkan tipe
-$tahun = (int) date('Y', strtotime($mulai));
+// Cek sisa cuti berdasarkan tipe — selalu gunakan TAHUN_AKTIF
+$tahun = (int) TAHUN_AKTIF;
 $saldo = cekSisaCuti($userId, $tahun, $pdo);
 
 $sisaCuti = 0;

@@ -63,7 +63,7 @@ if ($jenis === 'cuti') {
 
     // Saldo Cuti
     $saldo = $data['saldo'];
-    $tahunN = (int)date('Y', strtotime($data['tanggal_mulai']));
+    $tahunN = (int) TAHUN_AKTIF;
     $tipeCuti = $data['tipe_cuti'];
 
     $templateProcessor->setValue('thn_n', $tahunN);
@@ -75,6 +75,7 @@ if ($jenis === 'cuti') {
 
     // Kolom "Sisa" = saldo sebelum dikurangi (belum submit, jadi masih utuh)
     $templateProcessor->setValue('sisa_n', $sisaN);
+    // Untuk tahunan_lalu, sisa_n1 juga masih utuh di preview
     $templateProcessor->setValue('sisa_n1', $sisaN1);
     $templateProcessor->setValue('sisa_n2', '-');
 
@@ -92,10 +93,15 @@ if ($jenis === 'cuti') {
         foreach ($pnsHakimMap as $j => $tag) {
             $templateProcessor->setValue($tag, ($actualTipe === $j) ? $CEKLIS : $KOSONG);
         }
-        if ($actualTipe === 'tahunan') {
+        if ($tipeCuti === 'tahunan') {
             $sisaSetelah = max(0, $sisaN - $jumlahHari);
             $templateProcessor->setValue('ket_th', "diambil {$jumlahHari} sisa {$sisaSetelah} hari");
             $templateProcessor->setValue('ket_th1', '-');
+            $templateProcessor->setValue('ket_th2', '-');
+        } elseif ($tipeCuti === 'tahunan_lalu') {
+            $sisaSetelah = max(0, $sisaN1 - $jumlahHari);
+            $templateProcessor->setValue('ket_th', '-');
+            $templateProcessor->setValue('ket_th1', "diambil {$jumlahHari} sisa {$sisaSetelah} hari");
             $templateProcessor->setValue('ket_th2', '-');
         } else {
             $templateProcessor->setValue('ket_th', '-');
@@ -107,8 +113,15 @@ if ($jenis === 'cuti') {
         foreach ($pppkCheckMap as $j => $tag) {
             $templateProcessor->setValue($tag, ($actualTipe === $j) ? $CEKLIS : $KOSONG);
         }
-        $sisaSetelah = max(0, $sisaN - $jumlahHari);
-        $templateProcessor->setValue('ket_tahunan', $actualTipe === 'tahunan' ? "diambil {$jumlahHari} sisa {$sisaSetelah} hari" : '-');
+        if ($tipeCuti === 'tahunan') {
+            $sisaSetelah = max(0, $sisaN - $jumlahHari);
+            $templateProcessor->setValue('ket_tahunan', "diambil {$jumlahHari} sisa {$sisaSetelah} hari");
+        } elseif ($tipeCuti === 'tahunan_lalu') {
+            $sisaSetelah = max(0, $sisaN1 - $jumlahHari);
+            $templateProcessor->setValue('ket_tahunan', "diambil {$jumlahHari} sisa {$sisaSetelah} hari (tahun " . ($tahunN - 1) . ")");
+        } else {
+            $templateProcessor->setValue('ket_tahunan', '-');
+        }
         $sisaSakitSetelah = max(0, $saldo['jatah_sakit'] - $saldo['terpakai_sakit']);
         $templateProcessor->setValue('ket_sakit', $actualTipe === 'sakit' ? "diambil {$jumlahHari} sisa {$sisaSakitSetelah} hari" : '-');
         $sisaMelahirkanSetelah = max(0, $saldo['jatah_melahirkan'] - $saldo['terpakai_melahirkan']);

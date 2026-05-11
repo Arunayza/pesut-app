@@ -53,7 +53,7 @@ function cekOverlapCuti(PDO $pdo, int $userId, string $mulai, string $selesai): 
 
 // Jika tanggal belum diisi, kembalikan sisa saldo saja
 if (empty($mulai) || empty($selesai)) {
-    $tahun  = (int) date('Y');
+    $tahun  = (int) TAHUN_AKTIF;
     $saldo  = cekSisaCuti($userId, $tahun, $pdo);
     $sisaCuti = getSisaCuti($saldo, $tipeCuti);
     echo json_encode(['valid' => false, 'message' => 'Tanggal tidak boleh kosong', 'sisa_cuti' => $sisaCuti]);
@@ -68,7 +68,9 @@ if ($mulai > $selesai) {
 $hasilHari = hitungHariKerja($mulai, $selesai, $pdo, true);
 $hariKerja = $hasilHari['jumlah'];
 $tanggalList = $hasilHari['tanggal_list'];
-$saldo     = cekSisaCuti($userId, (int) date('Y', strtotime($mulai)), $pdo);
+// Selalu gunakan TAHUN_AKTIF untuk ambil saldo, karena 'tahunan_lalu' disimpan
+// di kolom jatah_tahunan_lalu pada baris saldo tahun aktif
+$saldo     = cekSisaCuti($userId, (int) TAHUN_AKTIF, $pdo);
 $sisaCuti  = getSisaCuti($saldo, $tipeCuti);
 
 // Format tanggal list untuk display
