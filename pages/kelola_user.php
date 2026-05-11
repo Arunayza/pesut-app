@@ -11,7 +11,7 @@ require_once __DIR__ . '/../helpers/role_helper.php';
 
 requireLogin();
 
-if ($_SESSION['role'] !== 'admin') {
+if (!in_array($_SESSION['role'], ['admin', 'staf_kpot'])) {
     setFlash('error', 'Anda tidak memiliki akses!');
     redirect(BASE_URL . '/index.php');
 }
@@ -46,6 +46,21 @@ $users = $stmt->fetchAll();
 require_once __DIR__ . '/../includes/header.php';
 require_once __DIR__ . '/../includes/sidebar.php';
 ?>
+
+<a href="<?= BASE_URL ?>/dashboard_v2.php" class="btn-back-dashboard" style="display: inline-flex; align-items: center; gap: 6px; color: var(--text-muted); text-decoration: none; font-size: 13px; font-weight: 600; margin-bottom: 16px; padding: 6px 14px; border-radius: 8px; transition: all 0.2s; border: 1px solid transparent;">
+    ← Kembali ke Dashboard
+</a>
+<style>
+    .btn-back-dashboard:hover {
+        color: var(--text-primary);
+        background: rgba(255,255,255,0.06);
+        border-color: rgba(255,255,255,0.1);
+    }
+    [data-theme="light"] .btn-back-dashboard:hover {
+        background: rgba(0,0,0,0.04);
+        border-color: rgba(0,0,0,0.08);
+    }
+</style>
 
 <div class="card">
     <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">

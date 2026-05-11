@@ -24,5 +24,41 @@ $pageTitle = $pageTitle ?? 'Dashboard';
     <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/style.css?v=<?= filemtime(__DIR__ . '/../assets/css/style.css') ?>">
     <script>window.PESUT_BASE_URL = '<?= BASE_URL ?>';</script>
 </head>
-<body>
-<div class="app-layout">
+    <?php
+    $designVersion = 'v2'; // V2 is now the default — V1 backup in cleanup/v1/
+    if ($designVersion === 'v2'): 
+    ?>
+    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/style_v2.css?v=<?= filemtime(__DIR__ . '/../assets/css/style_v2.css') ?>">
+    <style>
+        body.v2-layout {
+            background: var(--navy-900);
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(217, 130, 0, 0.08), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(59, 130, 246, 0.08), transparent 25%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        [data-theme="light"] body.v2-layout {
+            background: #f8fafc;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(37, 99, 235, 0.05), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(217, 130, 0, 0.05), transparent 25%);
+        }
+    </style>
+    <?php endif; ?>
+</head>
+<body class="<?= ($designVersion === 'v2') ? 'v2-layout' : '' ?>">
+<?php if ($designVersion === 'v2'): ?>
+    <?php require_once __DIR__ . '/header_v2.php'; ?>
+    <div class="main-container-v2">
+        <!-- V2 Flash Messages -->
+        <?php if ($flash): ?>
+            <div class="flash-message <?= $flash['type'] ?>" style="margin-bottom: 0;">
+                <?= $flash['type'] === 'success' ? '✅' : '❌' ?>
+                <?= htmlspecialchars($flash['message']) ?>
+            </div>
+        <?php endif; ?>
+<?php else: ?>
+    <div class="app-layout">
+<?php endif; ?>

@@ -34,7 +34,23 @@ require_once __DIR__ . '/../includes/header.php';
 require_once __DIR__ . '/../includes/sidebar.php';
 ?>
 
-<div class="card" style="max-width: 800px; margin: 0 auto;">
+<div style="max-width: 800px; margin: 0 auto; width: 100%;">
+    <a href="<?= BASE_URL ?>/dashboard_v2.php" class="btn-back-dashboard" style="display: inline-flex; align-items: center; gap: 6px; color: var(--text-muted); text-decoration: none; font-size: 13px; font-weight: 600; margin-bottom: 16px; padding: 6px 14px; border-radius: 8px; transition: all 0.2s; border: 1px solid transparent;">
+        ← Kembali ke Dashboard
+    </a>
+<style>
+    .btn-back-dashboard:hover {
+        color: var(--text-primary);
+        background: rgba(255,255,255,0.06);
+        border-color: rgba(255,255,255,0.1);
+    }
+    [data-theme="light"] .btn-back-dashboard:hover {
+        background: rgba(0,0,0,0.04);
+        border-color: rgba(0,0,0,0.08);
+    }
+</style>
+
+    <div class="card" style="width: 100%;">
     <div class="card-header" style="display: flex; gap: 16px; align-items: center; border-bottom: none; padding-bottom: 0;">
         <div class="user-avatar" style="width: 64px; height: 64px; font-size: 24px; border-radius: 16px;">
             <?= strtoupper(substr($user['nama'], 0, 1)) ?>
@@ -73,19 +89,29 @@ require_once __DIR__ . '/../includes/sidebar.php';
 
                     <div class="form-group">
                         <label>Email</label>
-                        <div style="display: flex; gap: 8px; align-items: center;">
-                            <input type="email" name="email" class="form-control" value="<?= htmlspecialchars($user['email'] ?? '') ?>" placeholder="Belum ada email">
+                        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                            <input type="email" name="email" id="input-email" class="form-control" value="<?= htmlspecialchars($user['email'] ?? '') ?>" placeholder="Belum ada email" style="margin-bottom:0; max-width: 250px;">
                             <?php if (!empty($user['email']) && empty($user['email_verified_at'])): ?>
-                                <span class="badge badge-warning" style="white-space: nowrap;">⚠️ Belum Verifikasi</span>
+                                <span class="badge badge-warning" id="badge-verif-status" style="white-space: nowrap;">⚠️ Belum Verifikasi</span>
                             <?php elseif (!empty($user['email']) && !empty($user['email_verified_at'])): ?>
-                                <span class="badge badge-success" style="white-space: nowrap;">✅ Terverifikasi</span>
+                                <span class="badge badge-success" id="badge-verif-status" style="white-space: nowrap;">✅ Terverifikasi</span>
+                            <?php endif; ?>
+                            <?php if (!empty($user['email'])): ?>
+                                <button type="button" class="btn btn-danger btn-sm" id="btn-lepas-email" style="padding: 6px 12px; font-size: 12px; border-radius: 6px;">🗑️ Lepas Tautan</button>
                             <?php endif; ?>
                         </div>
-                        <?php if (!empty($user['email']) && empty($user['email_verified_at'])): ?>
-                            <small style="display:block; margin-top: 4px;">
-                                <a href="<?= BASE_URL ?>/proses/profil.php?aksi=kirim_verifikasi" class="text-gold" style="text-decoration:none;">Kirim Ulang Link Verifikasi</a>
-                            </small>
-                        <?php endif; ?>
+                        
+                        <!-- OTP Section -->
+                        <div id="otp-section" style="margin-top: 12px; <?= (!empty($user['email']) && empty($user['email_verified_at'])) ? 'display:block;' : 'display:none;' ?>">
+                            <div style="display:flex; gap:8px;">
+                                <button type="button" class="btn btn-secondary btn-sm" id="btn-kirim-otp">Kirim Kode OTP</button>
+                                <div id="otp-input-group" style="display:none; gap:8px;">
+                                    <input type="text" id="input-otp" class="form-control" placeholder="123456" maxlength="6" style="margin-bottom:0; width: 120px; text-align:center; letter-spacing: 4px; font-weight: bold;">
+                                    <button type="button" class="btn btn-primary btn-sm" id="btn-verif-otp">Verifikasi</button>
+                                </div>
+                            </div>
+                            <small id="otp-msg" style="color: var(--text-muted); display:block; margin-top:4px;"></small>
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -160,6 +186,7 @@ require_once __DIR__ . '/../includes/sidebar.php';
 
     </div>
 </div>
+</div>
 
 <script>
 function switchTab(tabId) {
@@ -197,3 +224,125 @@ if (formPassword) {
 </script>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const btnKirimOTP = document.getElementById('btn-kirim-otp');
+    const inputEmail = document.getElementById('input-email');
+    const otpInputGroup = document.getElementById('otp-input-group');
+    const inputOtp = document.getElementById('input-otp');
+    const btnVerifOtp = document.getElementById('btn-verif-otp');
+    const otpMsg = document.getElementById('otp-msg');
+    const otpSection = document.getElementById('otp-section');
+    const badgeStatus = document.getElementById('badge-verif-status');
+
+    let originalEmail = inputEmail.value;
+
+    inputEmail.addEventListener('input', function() {
+        if (inputEmail.value !== '' && inputEmail.value !== originalEmail) {
+            otpSection.style.display = 'block';
+            otpInputGroup.style.display = 'none';
+            btnKirimOTP.style.display = 'block';
+            if (badgeStatus) badgeStatus.style.display = 'none';
+        } else if (inputEmail.value === '') {
+            otpSection.style.display = 'none';
+            if (badgeStatus) badgeStatus.style.display = 'none';
+        }
+    });
+
+    btnKirimOTP.addEventListener('click', async function() {
+        const emailVal = inputEmail.value.trim();
+        if(!emailVal) return alert('Email tidak boleh kosong!');
+        
+        btnKirimOTP.textContent = 'Mengirim...';
+        btnKirimOTP.disabled = true;
+
+        try {
+            const formData = new FormData();
+            formData.append('aksi', 'kirim_otp_ajax');
+            formData.append('email', emailVal);
+            
+            const r = await fetch('<?= BASE_URL ?>/proses/profil.php', { method: 'POST', body: formData });
+            const res = await r.json();
+            
+            if (res.status === 'success') {
+                otpMsg.textContent = res.message;
+                otpMsg.style.color = 'var(--green-500)';
+                btnKirimOTP.style.display = 'none';
+                otpInputGroup.style.display = 'flex';
+                // Update original email to current so we know it's saved
+                originalEmail = emailVal;
+            } else {
+                otpMsg.textContent = res.message;
+                otpMsg.style.color = 'var(--red-500)';
+                btnKirimOTP.textContent = 'Kirim Ulang Kode OTP';
+                btnKirimOTP.disabled = false;
+            }
+        } catch(e) {
+            otpMsg.textContent = 'Terjadi kesalahan sistem.';
+            otpMsg.style.color = 'var(--red-500)';
+            btnKirimOTP.textContent = 'Kirim Ulang Kode OTP';
+            btnKirimOTP.disabled = false;
+        }
+    });
+
+    btnVerifOtp.addEventListener('click', async function() {
+        const otpVal = inputOtp.value.trim();
+        if(!otpVal) return alert('Masukkan kode OTP!');
+        
+        btnVerifOtp.textContent = 'Memverifikasi...';
+        btnVerifOtp.disabled = true;
+
+        try {
+            const formData = new FormData();
+            formData.append('aksi', 'verif_otp_ajax');
+            formData.append('otp', otpVal);
+            
+            const r = await fetch('<?= BASE_URL ?>/proses/profil.php', { method: 'POST', body: formData });
+            const res = await r.json();
+            
+            if (res.status === 'success') {
+                otpSection.innerHTML = '<span class="badge badge-success">✅ Email Berhasil Diverifikasi!</span>';
+                setTimeout(() => window.location.reload(), 1500);
+            } else {
+                otpMsg.textContent = res.message;
+                otpMsg.style.color = 'var(--red-500)';
+                btnVerifOtp.textContent = 'Verifikasi';
+                btnVerifOtp.disabled = false;
+            }
+        } catch(e) {
+            otpMsg.textContent = 'Terjadi kesalahan sistem.';
+            otpMsg.style.color = 'var(--red-500)';
+            btnVerifOtp.textContent = 'Verifikasi';
+            btnVerifOtp.disabled = false;
+        }
+    });
+
+    const btnLepasEmail = document.getElementById('btn-lepas-email');
+    if (btnLepasEmail) {
+        btnLepasEmail.addEventListener('click', async function() {
+            if (confirm('Yakin ingin melepas tautan email ini? Jika dilepas, Anda tidak akan bisa mengubah password sampai menautkan email baru.')) {
+                btnLepasEmail.disabled = true;
+                btnLepasEmail.textContent = 'Memproses...';
+                try {
+                    const formData = new FormData();
+                    formData.append('aksi', 'lepas_email_ajax');
+                    const r = await fetch('<?= BASE_URL ?>/proses/profil.php', { method: 'POST', body: formData });
+                    const res = await r.json();
+                    if (res.status === 'success') {
+                        window.location.reload();
+                    } else {
+                        alert(res.message);
+                        btnLepasEmail.textContent = '🗑️ Lepas Tautan';
+                        btnLepasEmail.disabled = false;
+                    }
+                } catch(e) {
+                    alert('Terjadi kesalahan sistem.');
+                    btnLepasEmail.textContent = '🗑️ Lepas Tautan';
+                    btnLepasEmail.disabled = false;
+                }
+            }
+        });
+    }
+});
+</script>

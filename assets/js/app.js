@@ -429,9 +429,8 @@ function bacaSemuaNotif() {
         credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ aksi: 'baca_semua' })
-    }).then(r => r.json()).then(() => {
-        loadNotifications();
-        updateBadge(0);
+    }).then(() => {
+        window.location.reload();
     });
 }
 

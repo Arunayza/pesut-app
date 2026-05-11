@@ -174,6 +174,9 @@ require_once __DIR__ . '/../includes/sidebar.php';
 }
 </style>
 
+<a href="<?= BASE_URL ?>/dashboard_v2.php" class="btn-back-dashboard" style="display: inline-flex; align-items: center; gap: 6px; color: var(--text-muted); text-decoration: none; font-size: 13px; font-weight: 600; margin-bottom: 16px; padding: 6px 14px; border-radius: 8px; transition: all 0.2s; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.03);">
+    ← Kembali ke Dashboard
+</a>
 <div class="form-card">
     <div class="form-card-header">
         <div class="form-card-header-icon">🏖️</div>
@@ -267,7 +270,8 @@ require_once __DIR__ . '/../includes/sidebar.php';
             </div>
         </div>
 
-        <form action="<?= BASE_URL ?>/proses/ajukan_cuti.php" method="POST" id="form-cuti" enctype="multipart/form-data">
+        <form action="<?= BASE_URL ?>/proses/simpan_preview.php" method="POST" id="form-cuti" enctype="multipart/form-data">
+            <input type="hidden" name="jenis_form" value="cuti">
 
             <!-- Jenis & Periode -->
             <div class="form-section">
@@ -358,28 +362,11 @@ require_once __DIR__ . '/../includes/sidebar.php';
                 </div>
             </div>
 
-            <!-- TTD Pemohon -->
-            <div class="form-section">
-                <div class="form-section-title">✍️ Tanda Tangan Pemohon</div>
-                <div class="ttd-compact">
-                    <div>
-                        <div class="ttd-compact-label">✍️ Tanda Tangan Digital</div>
-                        <div class="ttd-compact-hint">Gambar tanda tangan menggunakan mouse atau jari di kolom di bawah</div>
-                    </div>
-                    <div class="ttd-canvas-wrap">
-                        <canvas id="ttd-canvas"></canvas>
-                    </div>
-                    <div class="ttd-toolbar">
-                        <button type="button" class="btn btn-secondary btn-sm" onclick="undoCanvas()">↩️ Undo</button>
-                        <button type="button" class="btn btn-secondary btn-sm" onclick="clearCanvas()">🗑️ Hapus</button>
-                    </div>
-                </div>
-                <input type="hidden" name="ttd_pengaju" id="ttd-data" required>
-            </div>
+
 
             <div class="form-submit-area">
-                <a href="<?= BASE_URL ?>/index.php" class="btn btn-secondary">Batal</a>
-                <button type="submit" id="btn-submit-cuti" class="btn btn-primary" disabled>🚀 Ajukan Cuti</button>
+                <a href="<?= BASE_URL ?>/dashboard_v2.php" class="btn btn-secondary">Batal</a>
+                <button type="submit" id="btn-submit-cuti" class="btn btn-primary" disabled>📄 Preview & Ajukan</button>
             </div>
         </form>
     </div>
@@ -392,63 +379,7 @@ function toggleLampiran(id, cb) {
     if (el) el.classList.toggle('show', cb.checked);
 }
 
-// ---- Signature Canvas ----
-const canvas = document.getElementById('ttd-canvas');
-if (canvas) {
-    const ctx = canvas.getContext('2d');
-    let isDrawing = false, lastX = 0, lastY = 0, paths = [], currentPath = [];
 
-    function resizeCanvas() {
-        const rect = canvas.getBoundingClientRect();
-        const dpr = window.devicePixelRatio || 1;
-        canvas.width = rect.width * dpr;
-        canvas.height = rect.height * dpr;
-        ctx.scale(dpr, dpr);
-        canvas.style.width = rect.width + 'px';
-        canvas.style.height = rect.height + 'px';
-        ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#1a1a2e';
-        redrawPaths();
-    }
-    function getPos(e) {
-        const rect = canvas.getBoundingClientRect();
-        const t = e.touches ? e.touches[0] : e;
-        return { x: t.clientX - rect.left, y: t.clientY - rect.top };
-    }
-    function startDraw(e) { e.preventDefault(); isDrawing = true; const p = getPos(e); lastX=p.x; lastY=p.y; currentPath=[{x:p.x,y:p.y}]; }
-    function draw(e) {
-        if (!isDrawing) return; e.preventDefault();
-        const p = getPos(e);
-        ctx.beginPath(); ctx.moveTo(lastX,lastY); ctx.lineTo(p.x,p.y); ctx.stroke();
-        lastX=p.x; lastY=p.y; currentPath.push({x:p.x,y:p.y});
-    }
-    function stopDraw() { if (isDrawing && currentPath.length>1) paths.push([...currentPath]); isDrawing=false; currentPath=[]; syncHidden(); }
-    function syncHidden() { document.getElementById('ttd-data').value = paths.length>0 ? canvas.toDataURL('image/png') : ''; }
-    function redrawPaths() {
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        ctx.lineWidth=2.5; ctx.lineCap='round'; ctx.lineJoin='round'; ctx.strokeStyle='#1a1a2e';
-        paths.forEach(path => {
-            if(path.length<2) return;
-            ctx.beginPath(); ctx.moveTo(path[0].x,path[0].y);
-            for(let i=1;i<path.length;i++) ctx.lineTo(path[i].x,path[i].y);
-            ctx.stroke();
-        });
-        syncHidden();
-    }
-    canvas.addEventListener('mousedown',startDraw); canvas.addEventListener('mousemove',draw);
-    canvas.addEventListener('mouseup',stopDraw); canvas.addEventListener('mouseleave',stopDraw);
-    canvas.addEventListener('touchstart',startDraw); canvas.addEventListener('touchmove',draw);
-    canvas.addEventListener('touchend',stopDraw);
-    window.clearCanvas = () => { paths=[]; ctx.clearRect(0,0,canvas.width,canvas.height); syncHidden(); };
-    window.undoCanvas  = () => { paths.pop(); redrawPaths(); };
-    resizeCanvas();
-}
-
-document.getElementById('form-cuti').addEventListener('submit', function(e) {
-    if (!document.getElementById('ttd-data').value) {
-        e.preventDefault();
-        alert('Silakan gambar tanda tangan Anda terlebih dahulu!');
-    }
-});
 </script>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>

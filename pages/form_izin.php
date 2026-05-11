@@ -100,6 +100,9 @@ require_once __DIR__ . '/../includes/sidebar.php';
 }
 </style>
 
+<a href="<?= BASE_URL ?>/dashboard_v2.php" class="btn-back-dashboard" style="display: inline-flex; align-items: center; gap: 6px; color: var(--text-muted); text-decoration: none; font-size: 13px; font-weight: 600; margin-bottom: 16px; padding: 6px 14px; border-radius: 8px; transition: all 0.2s; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.03);">
+    ← Kembali ke Dashboard
+</a>
 <div class="form-card">
     <div class="form-card-header">
         <div class="form-card-header-icon">📝</div>
@@ -128,7 +131,8 @@ require_once __DIR__ . '/../includes/sidebar.php';
             </span>
         </div>
 
-        <form action="<?= BASE_URL ?>/proses/ajukan_izin.php" method="POST" id="form-izin" enctype="multipart/form-data">
+        <form action="<?= BASE_URL ?>/proses/simpan_preview.php" method="POST" id="form-izin" enctype="multipart/form-data">
+            <input type="hidden" name="jenis_form" value="izin">
 
             <!-- Waktu -->
             <div class="form-section">
@@ -145,6 +149,15 @@ require_once __DIR__ . '/../includes/sidebar.php';
                     <div class="form-group">
                         <label for="jam_selesai">⏰ Jam Kembali</label>
                         <input type="time" id="jam_selesai" name="jam_selesai" class="form-control" required>
+                    </div>
+                    </div>
+                </div>
+                
+                <div class="preview-card" id="izin-preview" style="background: rgba(139,92,246,0.06); border: 1px solid rgba(139,92,246,0.2); border-radius: 10px; padding: 14px 18px; margin: 16px 0 0; display: none;">
+                    <h4 style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #8b5cf6; margin: 0 0 10px;">📊 Hasil Perhitungan</h4>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 5px 0; font-size: 12px;">
+                        <span style="color: var(--text-muted);">Lama Izin Keluar</span>
+                        <span id="preview-durasi" style="font-weight: 600; color: var(--text-primary);">—</span>
                     </div>
                 </div>
             </div>
@@ -176,8 +189,8 @@ require_once __DIR__ . '/../includes/sidebar.php';
             </div>
 
             <div class="form-submit-area">
-                <a href="<?= BASE_URL ?>/index.php" class="btn btn-secondary">Batal</a>
-                <button type="submit" class="btn btn-primary">🚀 Ajukan Izin</button>
+                <a href="<?= BASE_URL ?>/dashboard_v2.php" class="btn btn-secondary">Batal</a>
+                <button type="submit" class="btn btn-primary">📄 Preview & Ajukan</button>
             </div>
         </form>
     </div>
@@ -188,6 +201,40 @@ function toggleLampiran(id, cb) {
     const el = document.getElementById(id);
     if (el) el.classList.toggle('show', cb.checked);
 }
+
+const jamMulai = document.getElementById('jam_mulai');
+const jamSelesai = document.getElementById('jam_selesai');
+const previewCard = document.getElementById('izin-preview');
+const previewDurasi = document.getElementById('preview-durasi');
+
+function hitungDurasi() {
+    if (jamMulai.value && jamSelesai.value) {
+        previewCard.style.display = 'block';
+        const start = new Date(`2000-01-01T${jamMulai.value}`);
+        const end = new Date(`2000-01-01T${jamSelesai.value}`);
+        
+        if (end <= start) {
+            previewDurasi.textContent = 'Waktu tidak valid (Jam kembali harus setelah jam keluar)';
+            previewDurasi.style.color = '#ef4444';
+        } else {
+            let diffMs = end - start;
+            let diffHrs = Math.floor(diffMs / 3600000);
+            let diffMins = Math.round((diffMs % 3600000) / 60000);
+            
+            let text = '';
+            if (diffHrs > 0) text += `${diffHrs} Jam `;
+            if (diffMins > 0) text += `${diffMins} Menit`;
+            
+            previewDurasi.textContent = text.trim();
+            previewDurasi.style.color = 'var(--text-primary)';
+        }
+    } else {
+        previewCard.style.display = 'none';
+    }
+}
+
+jamMulai.addEventListener('change', hitungDurasi);
+jamSelesai.addEventListener('change', hitungDurasi);
 </script>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>

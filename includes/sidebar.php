@@ -1,7 +1,12 @@
 <?php
 /**
- * Sidebar Navigation Component
+ * Sidebar Component
  */
+$designVersion = 'v2'; // V2 is now the default
+if ($designVersion === 'v2') {
+    return;
+}
+
 $currentPage = basename($_SERVER['PHP_SELF']);
 
 // Hitung notifikasi belum dibaca
@@ -59,7 +64,7 @@ $showKelolaPengajuan = canAccessKelolaPengajuan($_SESSION['role'], $pdo, $_SESSI
             </a>
             <?php endif; ?>
 
-            <?php if ($_SESSION['role'] === 'admin'): ?>
+            <?php if (in_array($_SESSION['role'], ['admin', 'staf_kpot'])): ?>
             <a href="<?= BASE_URL ?>/pages/kelola_user.php" class="nav-link <?= $currentPage === 'kelola_user.php' || $currentPage === 'tambah_user.php' ? 'active' : '' ?>" title="Kelola Pegawai">
                 <span class="nav-icon">👥</span> <span class="nav-link-text">Kelola Pegawai</span>
             </a>

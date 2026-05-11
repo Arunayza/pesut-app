@@ -42,7 +42,7 @@ if ($aksi === 'update_profil') {
     try {
         if ($emailBerubah) {
             // Reset verification status and generate new token
-            $token = bin2hex(random_bytes(32));
+            $token = sprintf("%06d", mt_rand(1, 999999));
             $stmt = $pdo->prepare("UPDATE users SET email = ?, pangkat = ?, status_pegawai = ?, atasan_id = ?, no_telp = ?, alamat = ?, email_verified_at = NULL, email_verify_token = ? WHERE id = ?");
             $stmt->execute([empty($email) ? NULL : $email, $pangkat, $status_pegawai, $atasan_id, $no_telp, $alamat, $token, $userId]);
             
@@ -51,14 +51,13 @@ if ($aksi === 'update_profil') {
                 $mailer = getMailer();
                 if ($mailer) {
                     $mailer->addAddress($email);
-                    $mailer->Subject = 'Verifikasi Email PESUT';
-                    $link = 'http://localhost' . BASE_URL . '/pages/verifikasi.php?token=' . $token;
+                    $mailer->Subject = 'Kode Verifikasi OTP PESUT';
                     $mailer->isHTML(true);
-                    $mailer->Body = "Klik link ini untuk verifikasi email Anda: <a href='$link'>$link</a>";
+                    $mailer->Body = "Kode Verifikasi Email Anda adalah: <strong style='font-size: 24px;'>$token</strong>";
                     $mailer->send();
-                    setFlash('success', 'Profil diperbarui. Silakan cek email Anda untuk verifikasi.');
+                    setFlash('success', 'Profil diperbarui. Silakan cek email Anda untuk kode OTP verifikasi.');
                 } else {
-                    setFlash('warning', 'Profil diperbarui, namun sistem email belum dikonfigurasi. Link verifikasi Anda: ' . $link);
+                    setFlash('warning', 'Profil diperbarui, namun sistem email belum dikonfigurasi. Kode verifikasi OTP Anda: ' . $token);
                 }
             } else {
                 setFlash('success', 'Profil diperbarui tanpa email.');
@@ -78,38 +77,61 @@ if ($aksi === 'update_profil') {
     
     redirect(BASE_URL . '/pages/profil.php');
 
-} elseif ($aksi === 'kirim_verifikasi') {
-    $stmt = $pdo->prepare("SELECT email FROM users WHERE id = ?");
-    $stmt->execute([$userId]);
-    $user = $stmt->fetch();
-
-    if (empty($user['email'])) {
-        setFlash('error', 'Anda belum menambahkan email!');
-        redirect(BASE_URL . '/pages/profil.php');
+} elseif ($aksi === 'kirim_otp_ajax') {
+    $email = trim($_POST['email'] ?? '');
+    if (empty($email)) {
+        echo json_encode(['status' => 'error', 'message' => 'Email kosong!']);
         exit;
     }
 
-    $token = bin2hex(random_bytes(32));
-    $pdo->prepare("UPDATE users SET email_verify_token = ? WHERE id = ?")->execute([$token, $userId]);
+    $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ? AND id != ?");
+    $stmt->execute([$email, $userId]);
+    if ($stmt->fetch()) {
+        echo json_encode(['status' => 'error', 'message' => 'Email sudah dipakai akun lain!']);
+        exit;
+    }
+
+    $token = sprintf("%06d", mt_rand(1, 999999));
+    
+    $stmt = $pdo->prepare("UPDATE users SET email = ?, email_verified_at = NULL, email_verify_token = ? WHERE id = ?");
+    $stmt->execute([$email, $token, $userId]);
 
     $mailer = getMailer();
     if ($mailer) {
         try {
-            $mailer->addAddress($user['email']);
-            $mailer->Subject = 'Verifikasi Email PESUT';
-            $link = 'http://localhost' . BASE_URL . '/pages/verifikasi.php?token=' . $token;
+            $mailer->addAddress($email);
+            $mailer->Subject = 'Kode Verifikasi OTP PESUT';
             $mailer->isHTML(true);
-            $mailer->Body = "Klik link ini untuk verifikasi email Anda: <a href='$link'>$link</a>";
+            $mailer->Body = "Kode Verifikasi Email Anda adalah: <strong style='font-size: 24px;'>$token</strong>";
             $mailer->send();
-            setFlash('success', 'Link verifikasi berhasil dikirim ulang ke email Anda!');
+            echo json_encode(['status' => 'success', 'message' => 'Kode OTP berhasil dikirim ke email Anda!']);
         } catch (Exception $e) {
-            setFlash('error', 'Gagal mengirim email verifikasi.');
+            echo json_encode(['status' => 'error', 'message' => 'Gagal mengirim email.']);
         }
     } else {
-        $link = 'http://localhost' . BASE_URL . '/pages/verifikasi.php?token=' . $token;
-        setFlash('warning', 'Sistem email belum aktif. Gunakan link ini untuk testing lokal: ' . $link);
+        echo json_encode(['status' => 'success', 'message' => 'Sistem email mati. Kode OTP simulasi lokal: ' . $token]);
     }
-    redirect(BASE_URL . '/pages/profil.php');
+    exit;
+
+} elseif ($aksi === 'verif_otp_ajax') {
+    $otp = trim($_POST['otp'] ?? '');
+    
+    $stmt = $pdo->prepare("SELECT email_verify_token FROM users WHERE id = ?");
+    $stmt->execute([$userId]);
+    $user = $stmt->fetch();
+
+    if ($user && $user['email_verify_token'] === $otp) {
+        $pdo->prepare("UPDATE users SET email_verify_token = NULL, email_verified_at = CURRENT_TIMESTAMP WHERE id = ?")->execute([$userId]);
+        echo json_encode(['status' => 'success', 'message' => 'Email berhasil diverifikasi!']);
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Kode OTP salah!']);
+    }
+    exit;
+
+} elseif ($aksi === 'lepas_email_ajax') {
+    $pdo->prepare("UPDATE users SET email = NULL, email_verified_at = NULL, email_verify_token = NULL WHERE id = ?")->execute([$userId]);
+    echo json_encode(['status' => 'success', 'message' => 'Email berhasil dilepas!']);
+    exit;
 
 } elseif ($aksi === 'ubah_password_verified') {
     // Pastikan user sudah verifikasi email

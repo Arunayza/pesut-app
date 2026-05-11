@@ -35,58 +35,70 @@ require_once __DIR__ . '/../includes/sidebar.php';
         </div>
 
         <form action="<?= BASE_URL ?>/proses/tambah_user.php" method="POST" id="form-tambah-pegawai">
-            <div class="table-wrapper" style="overflow-x: auto; margin-bottom: 16px;">
-                <table style="width: 100%; min-width: 1100px;" id="table-pegawai">
-                    <thead>
-                        <tr>
-                            <th style="width: 12%">NIP <span style="color:red">*</span></th>
-                            <th style="width: 15%">Nama <span style="color:red">*</span></th>
-                            <th style="width: 8%">L/P <span style="color:red">*</span></th>
-                            <th style="width: 10%">Status <span style="color:red">*</span></th>
-                            <th style="width: 12%">Jabatan <span style="color:red">*</span></th>
-                            <th style="width: 13%">Pangkat/Gol</th>
-                            <th style="width: 12%">Mulai Kerja</th>
-                            <th style="width: 10%">Role</th>
-                            <th style="width: 5%">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tbody-pegawai">
-                        <tr class="row-pegawai">
-                            <td><input type="text" name="nip[]" class="form-control" required placeholder="NIP"></td>
-                            <td><input type="text" name="nama[]" class="form-control" required placeholder="Nama"></td>
-                            <td>
-                                <select name="jenis_kelamin[]" class="form-control" required>
-                                    <option value="L">L</option>
-                                    <option value="P">P</option>
-                                </select>
-                            </td>
-                            <td>
-                                <select name="status_pegawai[]" class="form-control" required>
-                                    <option value="PNS">PNS</option>
-                                    <option value="PPPK">PPPK</option>
-                                    <option value="Hakim">Hakim</option>
-                                </select>
-                            </td>
-                            <td><input type="text" name="jabatan[]" class="form-control" required placeholder="Jabatan"></td>
-                            <td><input type="text" name="pangkat[]" class="form-control" placeholder="Pangkat"></td>
-                            <td><input type="date" name="tgl_mulai_kerja[]" class="form-control" required value="<?= date('Y-m-d') ?>"></td>
-                            <td>
-                                <select name="role[]" class="form-control" required>
-                                    <?php foreach (ROLE_LABELS as $roleVal => $roleLabel): ?>
-                                    <option value="<?= $roleVal ?>" <?= $roleVal === 'staf_umk' ? 'selected' : '' ?>><?= htmlspecialchars($roleLabel) ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </td>
-                            <td>
-                                <button type="button" class="btn btn-danger btn-sm btn-hapus-baris" style="padding: 6px 10px;">X</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div id="pegawai-list" style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px;">
+                <!-- Initial Card -->
+                <div class="pegawai-card" style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 12px; padding: 20px; position: relative;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border); padding-bottom: 12px; margin-bottom: 16px;">
+                        <h4 style="margin: 0; font-size: 14px; font-weight: 700; color: var(--text-primary);">Pegawai #<span class="pgw-number">1</span></h4>
+                        <button type="button" class="btn btn-danger btn-sm btn-hapus-baris" style="padding: 4px 10px; font-size: 11px;">🗑️ Hapus</button>
+                    </div>
+                    
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label>NIP <span style="color:red">*</span></label>
+                            <input type="text" name="nip[]" class="form-control nip-input" required placeholder="Masukkan NIP 18 digit">
+                        </div>
+                        <div class="form-group">
+                            <label>Nama <span style="color:red">*</span></label>
+                            <input type="text" name="nama[]" class="form-control" required placeholder="Nama Lengkap & Gelar">
+                        </div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 100px 150px 1fr; gap: 16px; margin-bottom: 16px;">
+                        <div class="form-group" style="margin:0;">
+                            <label>L/P <span style="color:red">*</span></label>
+                            <select name="jenis_kelamin[]" class="form-control no-tomselect" required>
+                                <option value="L">L</option>
+                                <option value="P">P</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin:0;">
+                            <label>Status <span style="color:red">*</span></label>
+                            <select name="status_pegawai[]" class="form-control no-tomselect status-input" required>
+                                <option value="PNS">PNS</option>
+                                <option value="PPPK">PPPK</option>
+                                <option value="Hakim">Hakim</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin:0;">
+                            <label>Jabatan <span style="color:red">*</span></label>
+                            <input type="text" name="jabatan[]" class="form-control" required placeholder="Contoh: Analis Perkara Peradilan">
+                        </div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1.5fr; gap: 16px;">
+                        <div class="form-group" style="margin:0;">
+                            <label>Pangkat/Gol</label>
+                            <input type="text" name="pangkat[]" class="form-control" placeholder="Contoh: Penata Muda (III/a)">
+                        </div>
+                        <div class="form-group" style="margin:0;">
+                            <label>Mulai Kerja <span style="color:red">*</span></label>
+                            <input type="date" name="tgl_mulai_kerja[]" class="form-control tgl-input" required value="<?= date('Y-m-d') ?>">
+                        </div>
+                        <div class="form-group" style="margin:0;">
+                            <label>Role Sistem <span style="color:red">*</span></label>
+                            <select name="role[]" class="form-control tomselect-init" required>
+                                <?php foreach (ROLE_LABELS as $roleVal => $roleLabel): ?>
+                                <option value="<?= $roleVal ?>" <?= $roleVal === 'staf_umk' ? 'selected' : '' ?>><?= htmlspecialchars($roleLabel) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div style="margin-bottom: 24px;">
-                <button type="button" class="btn btn-secondary" id="btn-tambah-baris">➕ Tambah Baris Lagi</button>
+                <button type="button" class="btn btn-secondary" id="btn-tambah-baris">➕ Tambah Pegawai Lagi</button>
             </div>
 
             <hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 24px 0;">
@@ -99,42 +111,117 @@ require_once __DIR__ . '/../includes/sidebar.php';
     </div>
 </div>
 
+<!-- Template for Cloning -->
+<template id="pegawai-template">
+    <div class="pegawai-card" style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 12px; padding: 20px; position: relative;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border); padding-bottom: 12px; margin-bottom: 16px;">
+            <h4 style="margin: 0; font-size: 14px; font-weight: 700; color: var(--text-primary);">Pegawai #<span class="pgw-number">X</span></h4>
+            <button type="button" class="btn btn-danger btn-sm btn-hapus-baris" style="padding: 4px 10px; font-size: 11px;">🗑️ Hapus</button>
+        </div>
+        
+        <div class="form-grid-2">
+            <div class="form-group">
+                <label>NIP <span style="color:red">*</span></label>
+                <input type="text" name="nip[]" class="form-control nip-input" required placeholder="Masukkan NIP 18 digit">
+            </div>
+            <div class="form-group">
+                <label>Nama <span style="color:red">*</span></label>
+                <input type="text" name="nama[]" class="form-control" required placeholder="Nama Lengkap & Gelar">
+            </div>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 100px 150px 1fr; gap: 16px; margin-bottom: 16px;">
+            <div class="form-group" style="margin:0;">
+                <label>L/P <span style="color:red">*</span></label>
+                <select name="jenis_kelamin[]" class="form-control no-tomselect" required>
+                    <option value="L">L</option>
+                    <option value="P">P</option>
+                </select>
+            </div>
+            <div class="form-group" style="margin:0;">
+                <label>Status <span style="color:red">*</span></label>
+                <select name="status_pegawai[]" class="form-control no-tomselect status-input" required>
+                    <option value="PNS">PNS</option>
+                    <option value="PPPK">PPPK</option>
+                    <option value="Hakim">Hakim</option>
+                </select>
+            </div>
+            <div class="form-group" style="margin:0;">
+                <label>Jabatan <span style="color:red">*</span></label>
+                <input type="text" name="jabatan[]" class="form-control" required placeholder="Contoh: Analis Perkara Peradilan">
+            </div>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1.5fr; gap: 16px;">
+            <div class="form-group" style="margin:0;">
+                <label>Pangkat/Gol</label>
+                <input type="text" name="pangkat[]" class="form-control" placeholder="Contoh: Penata Muda (III/a)">
+            </div>
+            <div class="form-group" style="margin:0;">
+                <label>Mulai Kerja <span style="color:red">*</span></label>
+                <input type="date" name="tgl_mulai_kerja[]" class="form-control tgl-input" required value="<?= date('Y-m-d') ?>">
+            </div>
+            <div class="form-group" style="margin:0;">
+                <label>Role Sistem <span style="color:red">*</span></label>
+                <select name="role[]" class="form-control tomselect-init" required>
+                    <?php foreach (ROLE_LABELS as $roleVal => $roleLabel): ?>
+                    <option value="<?= $roleVal ?>" <?= $roleVal === 'staf_umk' ? 'selected' : '' ?>><?= htmlspecialchars($roleLabel) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </div>
+    </div>
+</template>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const tbody = document.getElementById('tbody-pegawai');
+    const listWrap = document.getElementById('pegawai-list');
     const btnTambah = document.getElementById('btn-tambah-baris');
+    const template = document.getElementById('pegawai-template');
 
-    // Tambah baris baru
-    btnTambah.addEventListener('click', function() {
-        const trLama = tbody.querySelector('.row-pegawai');
-        const trBaru = trLama.cloneNode(true);
-        
-        // Kosongkan value input text/date
-        trBaru.querySelectorAll('input').forEach(input => {
-            if (input.type === 'date') {
-                input.value = '<?= date('Y-m-d') ?>';
-            } else {
-                input.value = '';
-            }
+    // Init TomSelect for the first card
+    if (typeof TomSelect !== 'undefined') {
+        const firstTom = listWrap.querySelector('.tomselect-init');
+        if (firstTom) {
+            new TomSelect(firstTom, { create: false, sortField: { field: "text", direction: "asc" } });
+        }
+    }
+
+    function updateNumbers() {
+        const cards = listWrap.querySelectorAll('.pegawai-card');
+        cards.forEach((card, idx) => {
+            const numEl = card.querySelector('.pgw-number');
+            if (numEl) numEl.textContent = idx + 1;
         });
-        
-        // Reset select ke opsi pertama
-        trBaru.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
-        
-        tbody.appendChild(trBaru);
+    }
+
+    // Tambah card baru
+    btnTambah.addEventListener('click', function() {
+        const node = template.content.cloneNode(true);
+        listWrap.appendChild(node);
+        updateNumbers();
+
+        // Init TomSelect on the newly added element
+        const newCard = listWrap.lastElementChild;
+        const newSel = newCard.querySelector('.tomselect-init');
+        if (newSel && typeof TomSelect !== 'undefined') {
+            new TomSelect(newSel, { create: false, sortField: { field: "text", direction: "asc" } });
+        }
     });
 
-    // Hapus baris
-    tbody.addEventListener('click', function(e) {
+    // Hapus card
+    listWrap.addEventListener('click', function(e) {
         if (e.target.classList.contains('btn-hapus-baris')) {
-            const baris = document.querySelectorAll('.row-pegawai');
-            if (baris.length > 1) {
-                e.target.closest('tr').remove();
+            const cards = listWrap.querySelectorAll('.pegawai-card');
+            if (cards.length > 1) {
+                e.target.closest('.pegawai-card').remove();
+                updateNumbers();
             } else {
                 alert('Minimal harus ada 1 pegawai untuk ditambahkan!');
             }
         }
     });
+
     // === Auto-fill tgl_mulai_kerja dari NIP (PNS & Hakim) ===
     function parseTglMulaiFromNip(nip) {
         const clean = nip.replace(/\D/g, '');
@@ -147,35 +234,39 @@ document.addEventListener('DOMContentLoaded', function() {
         return `${year}-${month.padStart(2, '0')}-01`;
     }
 
-    function tryAutoFillRow(tr) {
-        const nipEl    = tr.querySelector('input[name="nip[]"]');
-        const statusEl = tr.querySelector('select[name="status_pegawai[]"]');
-        const tglEl    = tr.querySelector('input[name="tgl_mulai_kerja[]"]');
+    function tryAutoFillRow(card) {
+        if (!card) return;
+        const nipEl    = card.querySelector('.nip-input');
+        const statusEl = card.querySelector('.status-input');
+        const tglEl    = card.querySelector('.tgl-input');
         if (!nipEl || !statusEl || !tglEl) return;
+        
         const status = statusEl.value;
         if (status !== 'PNS' && status !== 'Hakim') return;
+        
         const tgl = parseTglMulaiFromNip(nipEl.value);
         if (tgl) {
             tglEl.value = tgl;
+            tglEl.style.transition = 'border-color 0.3s';
             tglEl.style.borderColor = 'var(--orange-400)';
             setTimeout(() => tglEl.style.borderColor = '', 1500);
         }
     }
 
-    // Event delegation: tangkap input NIP dan perubahan status di semua baris
-    tbody.addEventListener('input', function(e) {
-        if (e.target.name === 'nip[]') {
-            tryAutoFillRow(e.target.closest('tr'));
+    // Event delegation: tangkap input NIP dan perubahan status di semua card
+    listWrap.addEventListener('input', function(e) {
+        if (e.target.classList.contains('nip-input')) {
+            tryAutoFillRow(e.target.closest('.pegawai-card'));
         }
     });
-    tbody.addEventListener('blur', function(e) {
-        if (e.target.name === 'nip[]') {
-            tryAutoFillRow(e.target.closest('tr'));
+    listWrap.addEventListener('blur', function(e) {
+        if (e.target.classList.contains('nip-input')) {
+            tryAutoFillRow(e.target.closest('.pegawai-card'));
         }
     }, true);
-    tbody.addEventListener('change', function(e) {
-        if (e.target.name === 'status_pegawai[]') {
-            tryAutoFillRow(e.target.closest('tr'));
+    listWrap.addEventListener('change', function(e) {
+        if (e.target.classList.contains('status-input')) {
+            tryAutoFillRow(e.target.closest('.pegawai-card'));
         }
     });
 });

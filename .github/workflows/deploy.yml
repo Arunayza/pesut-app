@@ -1,0 +1,29 @@
+name: Deploy to InfinityFree via FTP
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  web-deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: Get latest code
+      uses: actions/checkout@v4
+      
+    - name: Sync files
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        # Pengecualian file/folder yang tidak perlu diupload ke server (seperti git, sql dsb)
+        exclude: |
+          **/.git*
+          **/.git*/**
+          **/.github/**
+          pesut.sql
+          README.md

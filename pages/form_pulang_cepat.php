@@ -144,6 +144,9 @@ require_once __DIR__ . '/../includes/sidebar.php';
 }
 </style>
 
+<a href="<?= BASE_URL ?>/dashboard_v2.php" class="btn-back-dashboard" style="display: inline-flex; align-items: center; gap: 6px; color: var(--text-muted); text-decoration: none; font-size: 13px; font-weight: 600; margin-bottom: 16px; padding: 6px 14px; border-radius: 8px; transition: all 0.2s; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.03);">
+    ← Kembali ke Dashboard
+</a>
 <div class="form-card">
     <div class="form-card-header">
         <div class="form-card-header-icon">⏰</div>
@@ -177,7 +180,8 @@ require_once __DIR__ . '/../includes/sidebar.php';
             </div>
         </div>
 
-        <form action="<?= BASE_URL ?>/proses/ajukan_pulang_cepat.php" method="POST" id="form-pc" enctype="multipart/form-data">
+        <form action="<?= BASE_URL ?>/proses/simpan_preview.php" method="POST" id="form-pc" enctype="multipart/form-data">
+            <input type="hidden" name="jenis_form" value="pulang_cepat">
 
             <!-- Jenis Izin -->
             <div class="form-section">
@@ -266,8 +270,8 @@ require_once __DIR__ . '/../includes/sidebar.php';
             </div>
 
             <div class="form-submit-area">
-                <a href="<?= BASE_URL ?>/index.php" class="btn btn-secondary">Batal</a>
-                <button type="submit" id="btn-submit-pc" class="btn btn-primary" disabled>🚀 Ajukan Izin Waktu</button>
+                <a href="<?= BASE_URL ?>/dashboard_v2.php" class="btn btn-secondary">Batal</a>
+                <button type="submit" id="btn-submit-pc" class="btn btn-primary" disabled>📄 Preview & Ajukan</button>
             </div>
         </form>
     </div>
@@ -308,7 +312,31 @@ document.querySelectorAll('input[name="tipe_izin_waktu"]').forEach(r => {
         // Trigger recalc
         const jamDiajukan = document.getElementById('jam_pulang_diajukan');
         if (jamDiajukan) jamDiajukan.dispatchEvent(new Event('change'));
+        
+        // Date constraints
+        const inputTanggal = document.getElementById('tanggal_pulang');
+        if (inputTanggal) {
+            if (isTerlambat) {
+                // Cannot be tomorrow, max is today
+                const today = new Date().toISOString().split('T')[0];
+                inputTanggal.setAttribute('max', today);
+                if (inputTanggal.value > today) {
+                    inputTanggal.value = today;
+                }
+            } else {
+                inputTanggal.removeAttribute('max');
+            }
+        }
     });
+});
+
+// Run once on load to set initial constraint
+window.addEventListener('DOMContentLoaded', () => {
+    const inputTanggal = document.getElementById('tanggal_pulang');
+    if (inputTanggal && document.querySelector('input[name="tipe_izin_waktu"]:checked').value === 'datang_terlambat') {
+        const today = new Date().toISOString().split('T')[0];
+        inputTanggal.setAttribute('max', today);
+    }
 });
 </script>
 

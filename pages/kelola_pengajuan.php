@@ -36,10 +36,28 @@ $sql = "
 
 $params = [$userId, $userId];
 
-// Role di ROLE_KELOLA & admin bisa lihat semua, sisanya hanya bawahan langsung
-if (!in_array($_SESSION['role'], ROLE_KELOLA) && $_SESSION['role'] !== 'admin') {
-    $sql .= " AND u.atasan_id = ?";
+// Admin, Staf KPOT, Kasubbag KPOT bisa lihat semua pengajuan
+$canSeeAll = in_array($_SESSION['role'], ['admin', 'staf_kpot', 'kasubbag_kpot']);
+
+if (!$canSeeAll) {
+    // Selain itu, HANYA bisa melihat pengajuan jika:
+    // 1. Dia adalah atasan pemohon
+    // 2. Dia sudah menandatangani pengajuan tersebut
+    // 3. Dia adalah Pejabat Berwenang untuk cuti pemohon tersebut
+    $sql .= " AND (
+        u.atasan_id = ? 
+        OR EXISTS(SELECT 1 FROM ttd_pengajuan tp WHERE tp.pengajuan_id = p.id AND tp.user_id = ?)
+        OR (
+            p.jenis_pengajuan = 'cuti' AND (
+                (? IN ('ketua', 'wakil_ketua') AND u.status_pegawai IN ('Hakim', 'PNS')) OR
+                (? IN ('sekretaris', 'panitera') AND u.status_pegawai = 'PPPK')
+            )
+        )
+    )";
     $params[] = $userId;
+    $params[] = $userId;
+    $params[] = $_SESSION['role'];
+    $params[] = $_SESSION['role'];
 }
 
 if ($filterStatus === 'pending') {
@@ -65,6 +83,21 @@ $flash = getFlash();
 require_once __DIR__ . '/../includes/header.php';
 require_once __DIR__ . '/../includes/sidebar.php';
 ?>
+
+<a href="<?= BASE_URL ?>/dashboard_v2.php" class="btn-back-dashboard" style="display: inline-flex; align-items: center; gap: 6px; color: var(--text-muted); text-decoration: none; font-size: 13px; font-weight: 600; margin-bottom: 16px; padding: 6px 14px; border-radius: 8px; transition: all 0.2s; border: 1px solid transparent;">
+    ← Kembali ke Dashboard
+</a>
+<style>
+    .btn-back-dashboard:hover {
+        color: var(--text-primary);
+        background: rgba(255,255,255,0.06);
+        border-color: rgba(255,255,255,0.1);
+    }
+    [data-theme="light"] .btn-back-dashboard:hover {
+        background: rgba(0,0,0,0.04);
+        border-color: rgba(0,0,0,0.08);
+    }
+</style>
 
 <div class="card">
     <div class="card-header" style="flex-wrap: wrap; gap: 12px;">
