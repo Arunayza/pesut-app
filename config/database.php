@@ -13,7 +13,7 @@ if ($is_localhost) {
     define('DB_PASS', '');
 } else {
     // Pengaturan database untuk InfinityFree
-    define('DB_HOST', 'sql302.infinityfree.com'); // Ganti dengan MySQL Hostname dari panel InfinityFree (contoh: sql302.infinityfree.com)
+    define('DB_HOST', 'sql105.infinityfree.com'); // Ganti dengan MySQL Hostname dari panel InfinityFree (contoh: sql302.infinityfree.com)
     define('DB_NAME', 'if0_41882425_pesut'); // Pastikan nama DB di panel InfinityFree sama dengan ini
     define('DB_USER', 'if0_41882425'); // Sesuai dengan username vPanel / FTP
     define('DB_PASS', '84P8g8wsfrzq82'); // Sesuai dengan password vPanel / FTP
