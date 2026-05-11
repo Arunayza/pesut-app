@@ -34,13 +34,15 @@ if (!isset($showPending)) {
 
 <!-- Glassmorphism Navbar -->
 <nav class="navbar-v2">
-    <!-- Burger Menu for Mobile -->
-    <button class="burger-menu-v2" onclick="toggleMobileMenuV2()">☰</button>
+    <div class="navbar-left">
+        <!-- Burger Menu for Mobile -->
+        <button class="burger-menu-v2" onclick="toggleMobileMenuV2()">☰</button>
 
-    <a href="<?= BASE_URL ?>/dashboard_v2.php" class="navbar-brand">
-        <img src="<?= BASE_URL ?>/assets/icon_logo.png" alt="Logo">
-        <h2>PENGADILAN TATA USAHA NEGARA SAMARINDA</h2>
-    </a>
+        <a href="<?= BASE_URL ?>/dashboard_v2.php" class="navbar-brand">
+            <img src="<?= BASE_URL ?>/assets/logo.png" alt="Logo PTUN">
+            <h2>PTUN SAMARINDA</h2>
+        </a>
+    </div>
 
     <!-- Mobile Notif Container (Visible only on mobile) -->
     <div class="mobile-notif-container" id="mobile-notif-container"></div>
@@ -50,6 +52,9 @@ if (!isset($showPending)) {
         $currentPage = basename($_SERVER['PHP_SELF']);
         $isDashboard = in_array($currentPage, ['dashboard_v2.php', 'index.php']);
         ?>
+
+        <!-- Garis Pembeda -->
+        <div class="navbar-divider"></div>
 
         <!-- Nav Links (hidden on mobile, burger menu used instead) -->
         <div class="navbar-nav-links">

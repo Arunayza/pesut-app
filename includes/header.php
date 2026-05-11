@@ -31,19 +31,7 @@ $pageTitle = $pageTitle ?? 'Dashboard';
     <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/style_v2.css?v=<?= filemtime(__DIR__ . '/../assets/css/style_v2.css') ?>">
     <style>
         body.v2-layout {
-            background: var(--navy-900);
-            background-image: 
-                radial-gradient(circle at 15% 50%, rgba(217, 130, 0, 0.08), transparent 25%),
-                radial-gradient(circle at 85% 30%, rgba(59, 130, 246, 0.08), transparent 25%);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        [data-theme="light"] body.v2-layout {
-            background: #f8fafc;
-            background-image: 
-                radial-gradient(circle at 15% 50%, rgba(37, 99, 235, 0.05), transparent 25%),
-                radial-gradient(circle at 85% 30%, rgba(217, 130, 0, 0.05), transparent 25%);
+            /* Background ditangani oleh style_v2.css (hero-bg-2.jpg) */
         }
     </style>
     <?php endif; ?>
