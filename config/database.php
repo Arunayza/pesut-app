@@ -4,7 +4,7 @@
  * Menggunakan PDO dengan prepared statements
  */
 
-$is_localhost = in_array($_SERVER['HTTP_HOST'], ['localhost', '127.0.0.1', '::1']) || strpos($_SERVER['HTTP_HOST'], 'localhost') !== false;
+$is_localhost = php_sapi_name() === 'cli' || (isset($_SERVER['HTTP_HOST']) && (in_array($_SERVER['HTTP_HOST'], ['localhost', '127.0.0.1', '::1']) || strpos($_SERVER['HTTP_HOST'], 'localhost') !== false));
 
 if ($is_localhost) {
     define('DB_HOST', 'localhost');
