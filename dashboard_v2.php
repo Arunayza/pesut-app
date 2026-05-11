@@ -103,28 +103,37 @@ require_once __DIR__ . '/includes/sidebar.php';
             <div class="quota-item-v2" style="display: flex; flex-direction: column; align-items: stretch; height: calc(100% - 28px); padding: 20px 24px 12px 24px;">
                 
                 <?php 
-                $quotas = [
-                    [
-                        'title' => 'Cuti Tahunan',
-                        'terpakai' => $saldo['terpakai_tahunan'],
-                        'jatah' => $saldo['jatah_tahunan'],
-                        'sisa' => $saldo['jatah_tahunan'] - $saldo['terpakai_tahunan'],
-                        'color' => '#3b82f6'
-                    ],
-                    [
-                        'title' => 'Cuti Sakit',
-                        'terpakai' => $saldo['terpakai_sakit'],
-                        'jatah' => $saldo['jatah_sakit'],
-                        'sisa' => $saldo['jatah_sakit'] - $saldo['terpakai_sakit'],
-                        'color' => '#10b981'
-                    ],
-                    [
-                        'title' => 'Alasan Penting',
-                        'terpakai' => $saldo['terpakai_alasan_penting'],
-                        'jatah' => $saldo['jatah_alasan_penting'],
-                        'sisa' => $saldo['jatah_alasan_penting'] - $saldo['terpakai_alasan_penting'],
-                        'color' => '#f59e0b'
-                    ]
+                $quotas = [];
+                // Tahunan Lalu pertama (jika bukan perempuan)
+                if ($userJenisKelamin !== 'P') {
+                    $quotas[] = [
+                        'title' => 'Tahunan Lalu',
+                        'terpakai' => $saldo['terpakai_tahunan_lalu'],
+                        'jatah' => $saldo['jatah_tahunan_lalu'],
+                        'sisa' => $saldo['jatah_tahunan_lalu'] - $saldo['terpakai_tahunan_lalu'],
+                        'color' => '#d4a843'
+                    ];
+                }
+                $quotas[] = [
+                    'title' => 'Cuti Tahunan',
+                    'terpakai' => $saldo['terpakai_tahunan'],
+                    'jatah' => $saldo['jatah_tahunan'],
+                    'sisa' => $saldo['jatah_tahunan'] - $saldo['terpakai_tahunan'],
+                    'color' => '#3b82f6'
+                ];
+                $quotas[] = [
+                    'title' => 'Cuti Sakit',
+                    'terpakai' => $saldo['terpakai_sakit'],
+                    'jatah' => $saldo['jatah_sakit'],
+                    'sisa' => $saldo['jatah_sakit'] - $saldo['terpakai_sakit'],
+                    'color' => '#10b981'
+                ];
+                $quotas[] = [
+                    'title' => 'Alasan Penting',
+                    'terpakai' => $saldo['terpakai_alasan_penting'],
+                    'jatah' => $saldo['jatah_alasan_penting'],
+                    'sisa' => $saldo['jatah_alasan_penting'] - $saldo['terpakai_alasan_penting'],
+                    'color' => '#f59e0b'
                 ];
                 if ($userJenisKelamin === 'P') {
                     $quotas[] = [
@@ -133,14 +142,6 @@ require_once __DIR__ . '/includes/sidebar.php';
                         'jatah' => $saldo['jatah_melahirkan'],
                         'sisa' => $saldo['jatah_melahirkan'] - $saldo['terpakai_melahirkan'],
                         'color' => '#ec4899'
-                    ];
-                } else {
-                    $quotas[] = [
-                        'title' => 'Tahunan Lalu',
-                        'terpakai' => $saldo['terpakai_tahunan_lalu'],
-                        'jatah' => $saldo['jatah_tahunan_lalu'],
-                        'sisa' => $saldo['jatah_tahunan_lalu'] - $saldo['terpakai_tahunan_lalu'],
-                        'color' => '#d4a843'
                     ];
                 }
                 ?>
@@ -156,10 +157,10 @@ require_once __DIR__ . '/includes/sidebar.php';
                             <div style="font-size: 11px; color: var(--text-muted); font-weight: 500;"><?= $q['terpakai'] ?> / <?= $q['jatah'] ?> Terpakai</div>
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 11px; font-weight: 600; color: <?= $q['color'] ?>; text-transform: uppercase; letter-spacing: 0.5px;">Sisa</span>
                             <div style="font-size: 16px; font-weight: 800; width: 40px; height: 40px; border-radius: 50%; background: <?= $q['color'] ?>20; color: <?= $q['color'] ?>; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 0 0 1px <?= $q['color'] ?>40;">
                                 <?= $q['sisa'] ?>
                             </div>
-                            <span style="font-size: 11px; font-weight: 600; color: <?= $q['color'] ?>; text-transform: uppercase; letter-spacing: 0.5px;">Sisa</span>
                         </div>
                     </div>
                     <!-- Background bar adalah abu-abu (sisa background), colored bar adalah progress (sisa cuti) -->
