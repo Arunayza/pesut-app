@@ -643,3 +643,13 @@
         [data-theme="light"] .notif-item.unread {
             background: rgba(59,130,246,0.05);
         }
+
+        /* Fix Select Options Visibility */
+        select option {
+            background-color: var(--navy-800);
+            color: var(--text-primary);
+        }
+        [data-theme="light"] select option {
+            background-color: #ffffff;
+            color: #1e293b;
+        }

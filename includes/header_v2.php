@@ -10,25 +10,28 @@ if (!isset($showPending)) {
 <div class="mobile-overlay" id="mobile-overlay" onclick="toggleMobileMenuV2()"></div>
 <div class="mobile-sidebar-v2" id="mobile-sidebar">
     <div class="mobile-sidebar-header">
-        <img src="<?= BASE_URL ?>/assets/icon_logo.png" alt="Logo" width="32">
         <h3>Menu Utama</h3>
         <button onclick="toggleMobileMenuV2()" style="background:none; border:none; font-size:18px; color:var(--text-muted); cursor:pointer;">✕</button>
     </div>
     <div class="mobile-sidebar-nav">
         <?php if ($showPending || $_SESSION['role'] === 'admin'): ?>
-            <a href="<?= BASE_URL ?>/pages/kelola_pengajuan.php" class="mobile-nav-link">📌 Kelola Pengajuan</a>
+            <a href="<?= BASE_URL ?>/pages/kelola_pengajuan.php" class="mobile-nav-link"><span style="display:inline-block; width: 24px; text-align: center;">📌</span> Kelola Pengajuan</a>
         <?php endif; ?>
         <?php if (in_array($_SESSION['role'], ['admin', 'staf_kpot'])): ?>
-            <a href="<?= BASE_URL ?>/pages/kelola_user.php" class="mobile-nav-link">👥 Kelola Pegawai</a>
+            <a href="<?= BASE_URL ?>/pages/kelola_user.php" class="mobile-nav-link"><span style="display:inline-block; width: 24px; text-align: center;">👥</span> Kelola Pegawai</a>
         <?php endif; ?>
-        <a href="<?= BASE_URL ?>/pages/riwayat.php" class="mobile-nav-link">📄 Riwayat Pengajuan</a>
+        <a href="<?= BASE_URL ?>/pages/riwayat.php" class="mobile-nav-link"><span style="display:inline-block; width: 24px; text-align: center;">📄</span> Riwayat Pengajuan</a>
     </div>
     <div class="mobile-sidebar-footer">
-        <a href="<?= BASE_URL ?>/pages/profil.php" class="mobile-nav-link">👤 Edit Profil</a>
-        <button class="mobile-nav-link theme-btn" onclick="toggleTheme()">
-            <span id="theme-icon-mobile">🌙</span> Ganti Tema
-        </button>
-        <a href="<?= BASE_URL ?>/proses/logout.php" class="mobile-nav-link logout-btn">🚪 Keluar Akun</a>
+        <a href="<?= BASE_URL ?>/pages/profil.php" class="mobile-nav-link"><span style="display:inline-block; width: 24px; text-align: center;">👤</span> Edit Profil</a>
+        <div class="mobile-nav-link theme-switch-item" onclick="toggleTheme()">
+            <span id="theme-icon-mobile" style="display:inline-block; width: 24px; text-align: center;">🌙</span> 
+            <span style="flex:1;">Mode Gelap</span>
+            <div class="theme-toggle-switch" id="theme-toggle-switch-mobile">
+                <div class="theme-toggle-knob"></div>
+            </div>
+        </div>
+        <a href="<?= BASE_URL ?>/proses/logout.php" class="mobile-nav-link logout-btn"><span style="display:inline-block; width: 24px; text-align: center;">🚪</span> Keluar Akun</a>
     </div>
 </div>
 

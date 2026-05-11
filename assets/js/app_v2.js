@@ -62,12 +62,12 @@ function updateThemeIcons() {
     if (iconDrop) iconDrop.textContent = isLight ? '☀️' : '🌙';
     if (iconMobile) iconMobile.textContent = isLight ? '☀️' : '🌙';
     
-    // Update label text for theme switch
-    const switchItem = document.querySelector('.theme-switch-item');
-    if (switchItem) {
-        const label = switchItem.querySelector('span[style*="flex"]');
+    // Update label text for all theme switches
+    const switchItems = document.querySelectorAll('.theme-switch-item');
+    switchItems.forEach(item => {
+        const label = item.querySelector('span[style*="flex"]');
         if (label) label.textContent = isLight ? 'Mode Terang' : 'Mode Gelap';
-    }
+    });
 }
 document.addEventListener('DOMContentLoaded', updateThemeIcons);
 const observer = new MutationObserver(updateThemeIcons);
