@@ -164,15 +164,7 @@
     background: rgba(255, 255, 255, 0.2) !important;
 }
 
-[data-theme="light"] body::before {
-    background: none;
-    /* Clean solid background */
-}
-
-[data-theme="light"] body {
-    background: #f1f5f9;
-    /* Light gray background */
-}
+    /* Clean solid background (REMOVED: Now uses dark background in light mode as well) */
 
 [data-theme="light"] .login-logo h1 {
     background: #1d4ed8;
