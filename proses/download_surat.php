@@ -156,12 +156,10 @@ if ($data['jenis_pengajuan'] === 'cuti') {
             'di_luar_tanggungan_negara' => 'k6',
         ];
 
-        foreach (['k1','k2','k3','k4','k5','k6'] as $tag) {
-            $templateProcessor->setValue($tag, $KOSONG);
-        }
+        // Tentukan tag aktif DULU sebelum set nilai
         $activeTag = $pnsHakimMap[$realTipeCuti] ?? null;
-        if ($activeTag) {
-            $templateProcessor->setValue($activeTag, $CEKLIS);
+        foreach (['k1','k2','k3','k4','k5','k6'] as $tag) {
+            $templateProcessor->setValue($tag, ($tag === $activeTag) ? $CEKLIS : $KOSONG);
         }
 
         // Keterangan: ket_th, ket_th1, ket_th2

@@ -293,12 +293,10 @@ if ($data['jenis_pengajuan'] === 'izin') {
             'di_luar_tanggungan_negara' => 'k6',
         ];
 
-        foreach (['k1','k2','k3','k4','k5','k6'] as $tag) {
-            $templateProcessor->setValue($tag, '');
-        }
+        // Tentukan tag aktif DULU sebelum set nilai
         $activeTag = $pnsHakimMap[$realTipeCuti] ?? null;
-        if ($activeTag) {
-            $templateProcessor->setValue($activeTag, 'V');
+        foreach (['k1','k2','k3','k4','k5','k6'] as $tag) {
+            $templateProcessor->setValue($tag, ($tag === $activeTag) ? 'V' : '');
         }
 
         // Keterangan Cuti Tahunan per tahun: ket_th, ket_th1, ket_th2
