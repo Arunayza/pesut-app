@@ -69,8 +69,8 @@ require_once __DIR__ . '/includes/sidebar.php';
     <!-- Header Greeting & Notif -->
     <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px;">
         <div>
-            <h1 style="font-size: 22px; font-weight: 800; margin-bottom: 4px;">Halo, <?= htmlspecialchars(explode(',', $_SESSION['nama'])[0]) ?> 👋</h1>
-            <p style="color: var(--text-secondary); font-size: 14px;">Selamat datang kembali di dashboard Anda.</p>
+            <h1 style="font-size: 22px; font-weight: 800; margin-bottom: 4px; color: #f8fafc;">Halo, <?= htmlspecialchars(explode(',', $_SESSION['nama'])[0]) ?> 👋</h1>
+            <p style="color: #cbd5e1; font-size: 14px;">Selamat datang kembali di dashboard Anda.</p>
         </div>
         
         <!-- Desktop Notif Container -->
@@ -99,7 +99,7 @@ require_once __DIR__ . '/includes/sidebar.php';
     <div class="dashboard-top-grid">
         <!-- Kolom Kiri: Sisa Kuota (Single Card List) -->
         <div>
-            <h2 style="font-size: 14px; font-weight: 700; margin-bottom: 10px; color: var(--text-secondary);">📊 Sisa Kuota Cuti (<?= TAHUN_AKTIF ?>)</h2>
+            <h2 style="font-size: 14px; font-weight: 700; margin-bottom: 10px; color: #cbd5e1;">📊 Sisa Kuota Cuti (<?= TAHUN_AKTIF ?>)</h2>
             <div class="quota-item-v2" style="display: flex; flex-direction: column; align-items: stretch; height: calc(100% - 28px); padding: 20px 24px 12px 24px;">
                 
                 <?php 
@@ -174,7 +174,7 @@ require_once __DIR__ . '/includes/sidebar.php';
 
         <!-- Kolom Kanan: Pending Card -->
         <div>
-            <h2 style="font-size: 14px; font-weight: 700; margin-bottom: 10px; color: var(--text-secondary);">⏳ Sedang Diproses</h2>
+            <h2 style="font-size: 14px; font-weight: 700; margin-bottom: 10px; color: #cbd5e1;">⏳ Sedang Diproses</h2>
             <div class="quota-item-v2" style="display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; height: calc(100% - 28px); padding: 24px 20px;">
                 <div style="text-align: center; margin-bottom: 10px;">
                     <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 2px;">Pengajuan Pending</h4>
@@ -193,7 +193,7 @@ require_once __DIR__ . '/includes/sidebar.php';
 
     <!-- Quick Menus -->
     <div style="margin-top: 8px;">
-        <h2 style="font-size: 14px; font-weight: 700; margin-bottom: 10px; color: var(--text-secondary);">🚀 Buat Pengajuan Baru</h2>
+        <h2 style="font-size: 14px; font-weight: 700; margin-bottom: 10px; color: #cbd5e1;">🚀 Buat Pengajuan Baru</h2>
         <div class="quick-menus-grid">
             <a href="<?= BASE_URL ?>/pages/form_cuti.php" class="quick-card cuti">
                 <div class="quick-icon">🏖️</div>
@@ -217,7 +217,7 @@ require_once __DIR__ . '/includes/sidebar.php';
 
     <!-- Riwayat Terbaru (Full Width) -->
     <div style="margin-top: 12px;">
-        <h2 style="font-size: 14px; font-weight: 700; margin-bottom: 10px; color: var(--text-secondary);">📄 Riwayat Terbaru</h2>
+        <h2 style="font-size: 14px; font-weight: 700; margin-bottom: 10px; color: #cbd5e1;">📄 Riwayat Terbaru</h2>
         <div class="quota-item-v2" style="display: block; padding: 0; overflow: hidden;">
             <?php if (count($recentRiwayat) > 0): ?>
                 <div class="table-wrapper" style="margin: 0; border: none; box-shadow: none; border-radius: 0;">

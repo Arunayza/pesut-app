@@ -6,7 +6,7 @@
 define('APP_NAME', 'PESUT');
 define('APP_FULL_NAME', 'Pengajuan Elektronik Surat Izin & Cuti Terpadu');
 define('APP_INSTANSI', 'PTUN Samarinda');
-define('APP_VERSION', '1.0.0');
+define('APP_VERSION', '2.0.0');
 
 define('JAM_MASUK', '08:00');
 define('JAM_PULANG_SENIN_KAMIS', '16:30');

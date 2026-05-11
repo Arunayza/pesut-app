@@ -128,3 +128,17 @@ if (!isset($showPending)) {
         </div>
     </div>
 </nav>
+
+<script>
+// Dynamic Navbar background on scroll
+window.addEventListener('scroll', function() {
+    const navbar = document.querySelector('.navbar-v2');
+    if (navbar) {
+        if (window.scrollY > 10) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
+        }
+    }
+});
+</script>
