@@ -237,6 +237,18 @@ if ($data['jenis_pengajuan'] === 'izin') {
     $saldo = cekSisaCuti($data['user_id'], $tahunCuti, $pdo);
     $tahunN = $tahunCuti;
 
+    // Deteksi tipe cuti asli (tahunan vs tahunan_lalu) dari log_aktivitas
+    // karena DB menyimpan keduanya sebagai 'tahunan'
+    $realTipeCuti = $data['tipe_cuti'];
+    if ($realTipeCuti === 'tahunan') {
+        $stmtLog = $pdo->prepare("SELECT catatan FROM log_aktivitas WHERE pengajuan_id = ? AND aksi = 'pengajuan_baru' LIMIT 1");
+        $stmtLog->execute([$pengajuanId]);
+        $logCatatan = $stmtLog->fetchColumn() ?: '';
+        if (strpos($logCatatan, 'tahunan_lalu') !== false) {
+            $realTipeCuti = 'tahunan_lalu';
+        }
+    }
+
     $templateProcessor->setValue('thn_n', $tahunN);
     $templateProcessor->setValue('thn_n1', $tahunN - 1);
     $templateProcessor->setValue('thn_n2', $tahunN - 2);
@@ -247,7 +259,7 @@ if ($data['jenis_pengajuan'] === 'izin') {
     $sisaN1 = max(0, $saldo['jatah_tahunan_lalu'] - $saldo['terpakai_tahunan_lalu']);
 
     // Kolom "Sisa" di template = saldo SEBELUM dikurangi (kembalikan jumlah hari jika cuti tahunan)
-    if ($data['tipe_cuti'] === 'tahunan') {
+    if ($realTipeCuti === 'tahunan') {
         $sisaSebelumN = $sisaN + $jumlahHari;  // tambahkan kembali hari yg sudah dipotong
     } else {
         $sisaSebelumN = $saldo['jatah_tahunan'] - $saldo['terpakai_tahunan'];
@@ -255,7 +267,7 @@ if ($data['jenis_pengajuan'] === 'izin') {
     $sisaSebelumN = max(0, $sisaSebelumN);
 
     // Jika tahunan_lalu, sisa N-1 SEBELUM dikurangi
-    if ($data['tipe_cuti'] === 'tahunan_lalu') {
+    if ($realTipeCuti === 'tahunan_lalu') {
         $sisaSebelumN1 = $sisaN1 + $jumlahHari;
     } else {
         $sisaSebelumN1 = $sisaN1;
@@ -284,17 +296,17 @@ if ($data['jenis_pengajuan'] === 'izin') {
         foreach (['k1','k2','k3','k4','k5','k6'] as $tag) {
             $templateProcessor->setValue($tag, '');
         }
-        $activeTag = $pnsHakimMap[$data['tipe_cuti']] ?? null;
+        $activeTag = $pnsHakimMap[$realTipeCuti] ?? null;
         if ($activeTag) {
             $templateProcessor->setValue($activeTag, 'V');
         }
 
         // Keterangan Cuti Tahunan per tahun: ket_th, ket_th1, ket_th2
-        if ($data['tipe_cuti'] === 'tahunan') {
+        if ($realTipeCuti === 'tahunan') {
             $templateProcessor->setValue('ket_th', "diambil {$jumlahHari} sisa {$sisaN} hari");
             $templateProcessor->setValue('ket_th1', '-');
             $templateProcessor->setValue('ket_th2', '-');
-        } elseif ($data['tipe_cuti'] === 'tahunan_lalu') {
+        } elseif ($realTipeCuti === 'tahunan_lalu') {
             $templateProcessor->setValue('ket_th', '-');
             $templateProcessor->setValue('ket_th1', "diambil {$jumlahHari} sisa {$sisaN1} hari");
             $templateProcessor->setValue('ket_th2', '-');
