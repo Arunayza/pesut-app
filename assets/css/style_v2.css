@@ -22,6 +22,9 @@
 
         /* Glassmorphism Navbar - Menyatu dengan background */
         .navbar-v2 {
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
             height: 70px;
             background: transparent;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -567,22 +570,6 @@
         [data-theme="light"] body::before {
             /* Di V2, background image tetap sama di light mode agar elegan */
         }
-        [data-theme="light"] .navbar-v2 {
-            background: transparent;
-            border-bottom: 1px solid rgba(0,0,0,0.1);
-        }
-        [data-theme="light"] .navbar-v2.scrolled {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        }
-        [data-theme="light"] .navbar-brand h2 {
-            color: #1e293b;
-        }
-        [data-theme="light"] .navbar-divider {
-            background: rgba(0,0,0,0.15);
-        }
         [data-theme="light"] .quick-card {
             background: #ffffff;
             border-color: rgba(0,0,0,0.05);
@@ -599,6 +586,12 @@
         }
         [data-theme="light"] .btn-glass:hover {
             background: rgba(0,0,0,0.06);
+        }
+        [data-theme="light"] .profile-dropdown-menu,
+        [data-theme="light"] .notif-dropdown {
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
         }
         [data-theme="light"] .quota-item-v2 {
             background: #ffffff;
