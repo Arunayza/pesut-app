@@ -62,7 +62,7 @@
 /* ---- Light Theme (PTUN Blue & Orange) ---- */
 [data-theme="light"] {
     /* Base: Clean White/Gray with Blue undertone */
-    --navy-900: #f4f6fa;
+    --navy-900: #181166; /* Keep background dark! */
     --navy-800: #ffffff;
     --navy-700: #e6ebf4;
     --navy-600: #ced8eb;

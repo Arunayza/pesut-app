@@ -34,6 +34,7 @@ if (!isset($showPending)) {
 
 <!-- Glassmorphism Navbar -->
 <nav class="navbar-v2">
+    <div class="navbar-inner">
     <div class="navbar-left">
         <!-- Burger Menu for Mobile -->
         <button class="burger-menu-v2" onclick="toggleMobileMenuV2()">☰</button>
@@ -126,6 +127,7 @@ if (!isset($showPending)) {
                 </a>
             </div>
         </div>
+    </div>
     </div>
 </nav>
 

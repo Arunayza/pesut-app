@@ -23,16 +23,23 @@
         /* Glassmorphism Navbar - Menyatu dengan background */
         .navbar-v2 {
             height: 70px;
-            background: transparent; /* Menyatu dengan background */
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Garis pembeda */
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 4%;
+            background: transparent;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             position: sticky;
             top: 0;
             z-index: 100;
             transition: background 0.3s, backdrop-filter 0.3s, box-shadow 0.3s;
+        }
+
+        .navbar-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            height: 100%;
+            padding: 0 4%;
         }
 
         .navbar-v2.scrolled {
