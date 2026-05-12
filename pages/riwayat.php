@@ -143,6 +143,7 @@ require_once __DIR__ . '/../includes/sidebar.php';
                 <p>Belum ada pengajuan yang sesuai dengan filter.</p>
             </div>
         <?php else: ?>
+
             <div class="table-wrapper">
                 <table>
                     <thead>
@@ -224,6 +225,63 @@ require_once __DIR__ . '/../includes/sidebar.php';
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Mobile Cards (tampil hanya di HP) -->
+            <div class="mobile-cards">
+                <?php foreach ($pengajuan as $p): ?>
+                <div class="mobile-card" style="flex-direction: column; gap: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
+                        <div>
+                            <div style="margin-bottom: 6px;"><?= jenisBadge($p['jenis_pengajuan'], $p['tipe_izin_waktu'] ?? null) ?></div>
+                            <div style="font-size: 11px; color: var(--text-muted);">Diajukan: <?= formatTanggal(substr($p['created_at'], 0, 10)) ?></div>
+                        </div>
+                        <div style="text-align: right;">
+                            <?= statusBadge($p['status']) ?>
+                        </div>
+                    </div>
+                    
+                    <div style="background: rgba(0,0,0,0.02); padding: 10px; border-radius: 8px; border: 1px solid var(--glass-border);">
+                        <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.4;">
+                            <?php if ($p['jenis_pengajuan'] === 'cuti'): ?>
+                                <strong>Tanggal:</strong> <?= formatTanggal($p['tanggal_mulai']) ?> - <?= formatTanggal($p['tanggal_selesai']) ?><br>
+                                <span style="color: var(--text-muted);"><?= $p['jumlah_hari'] ?> hari kerja (<?= ucwords(str_replace('_', ' ', $p['tipe_cuti'] ?? 'tahunan')) ?>)</span>
+                            <?php elseif ($p['jenis_pengajuan'] === 'izin'): ?>
+                                <strong>Tanggal:</strong> <?= formatTanggal($p['tanggal_mulai']) ?><br>
+                                <span style="color: var(--text-muted);">Jam: <?= substr($p['jam_mulai'] ?? '00:00', 0, 5) ?> - <?= substr($p['jam_selesai'] ?? '00:00', 0, 5) ?></span>
+                            <?php else: ?>
+                                <strong>Tanggal:</strong> <?= formatTanggal($p['tanggal_pulang']) ?><br>
+                                <span style="color: var(--text-muted);">
+                                    <?php if (($p['tipe_izin_waktu'] ?? '') === 'datang_terlambat'): ?>
+                                        Datang: <?= substr($p['jam_pulang_diajukan'] ?? '', 0, 5) ?> (Resmi: <?= substr($p['jam_pulang_resmi'] ?? '', 0, 5) ?>)
+                                    <?php else: ?>
+                                        Pulang: <?= substr($p['jam_pulang_diajukan'] ?? '', 0, 5) ?> (Resmi: <?= substr($p['jam_pulang_resmi'] ?? '', 0, 5) ?>)
+                                    <?php endif; ?>
+                                </span>
+                            <?php endif; ?>
+                        </div>
+                        <div style="font-size: 12px; color: var(--text-primary); margin-top: 6px; font-style: italic;">
+                            "<?= htmlspecialchars($p['alasan']) ?>"
+                        </div>
+                        <?php if ($p['catatan_approval']): ?>
+                        <div style="font-size: 11px; color: var(--text-muted); margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--glass-border);">
+                            <strong>Catatan:</strong> <?= htmlspecialchars($p['catatan_approval']) ?>
+                        </div>
+                        <?php endif; ?>
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; width: 100%; gap: 6px;">
+                        <?php if ($p['status'] === 'disetujui'): ?>
+                            <a href="<?= BASE_URL ?>/proses/download_surat.php?id=<?= $p['id'] ?>" class="btn btn-primary btn-sm" target="_blank">📥 PDF</a>
+                            <?php if (in_array($p['jenis_pengajuan'], ['cuti', 'izin', 'pulang_cepat'])): ?>
+                                <a href="<?= BASE_URL ?>/proses/download_word.php?id=<?= $p['id'] ?>" class="btn btn-success btn-sm" target="_blank">📄 Word</a>
+                            <?php endif; ?>
+                        <?php elseif ($p['status'] === 'pending'): ?>
+                            <button type="button" class="btn btn-danger btn-sm" onclick="openCancelModal(<?= $p['id'] ?>)">✕ Batalkan</button>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                <?php endforeach; ?>
             </div>
         <?php endif; ?>
     </div>

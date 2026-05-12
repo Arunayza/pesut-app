@@ -151,9 +151,48 @@ require_once __DIR__ . '/../includes/sidebar.php';
     .pdf-error h4 { font-size: 15px; font-weight: 700; margin: 0 0 6px; color: var(--text-primary); }
     .pdf-error p { font-size: 13px; margin: 0; }
 
+    .pdf-error p { font-size: 13px; margin: 0; }
+
+    /* TTD Canvas Styles (Synced with review_pengajuan) */
+    .ttd-canvas-wrapper {
+        border: 2px dashed var(--glass-border);
+        border-radius: 12px;
+        padding: 16px;
+        background: rgba(255,255,255,0.02);
+        text-align: center;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+    #ttd-canvas {
+        width: 100%;
+        height: 200px;
+        background-color: #f8f9fa;
+        background-image: linear-gradient(to right, transparent 49.5%, rgba(0,0,0,0.15) 49.5%, rgba(0,0,0,0.15) 50.5%, transparent 50.5%), linear-gradient(to bottom, transparent 65%, rgba(0,0,0,0.15) 65%, rgba(0,0,0,0.15) 67%, transparent 67%);
+        border: 2px solid #ced4da;
+        border-radius: 8px;
+        cursor: crosshair;
+        touch-action: none;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .ttd-actions {
+        margin-top: 10px;
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+    }
+
     /* Light mode fixes */
     [data-theme="light"] .btn-edit-back { background: rgba(0,0,0,0.04); }
     [data-theme="light"] .btn-edit-back:hover { background: rgba(0,0,0,0.07); }
+    [data-theme="light"] .ttd-canvas-wrapper { border-color: rgba(0, 0, 0, 0.12) !important; background: rgba(0, 0, 0, 0.01) !important; }
+
+    .mobile-only-notice { display: none; }
+    @media (max-width: 768px) {
+        .mobile-only-notice { display: block; margin-bottom: 10px; }
+        .preview-actions { flex-direction: column; }
+        .preview-actions .btn { width: 100%; justify-content: center; }
+        .pdf-frame { min-height: 50vh; }
+    }
 </style>
 
 <div class="preview-wrapper">
@@ -190,7 +229,11 @@ require_once __DIR__ . '/../includes/sidebar.php';
     <div class="pdf-container">
         <div class="pdf-container-header">
             <h4>📄 Dokumen Preview — <?= htmlspecialchars($jenisLabel) ?></h4>
-            <span style="font-size: 11px; color: var(--text-muted);">Dihasilkan dari template resmi</span>
+            <span style="font-size: 11px; color: var(--text-muted); display: none;">Dihasilkan dari template resmi</span>
+        </div>
+
+        <div class="mobile-only-notice" style="padding: 12px 16px; background: rgba(59,130,246,0.1); border-bottom: 1px solid rgba(59,130,246,0.2); font-size: 13px; text-align: center; color: var(--text-primary);">
+            📱 Jika dokumen tidak muncul, <a href="<?= BASE_URL ?>/proses/generate_preview_pdf.php" target="_blank" style="font-weight:700; text-decoration:underline; color: var(--blue-400);">Klik di Sini</a> untuk mendownload/membuka PDF.
         </div>
 
         <!-- Loading state -->
@@ -223,12 +266,12 @@ require_once __DIR__ . '/../includes/sidebar.php';
         <h4 style="font-size: 15px; font-weight: 700; color: var(--text-primary); margin: 0 0 16px; display: flex; align-items: center; gap: 8px;">✍️ Tanda Tangan Pemohon</h4>
         <p style="font-size: 13px; color: var(--text-muted); margin: 0 0 16px;">Silakan gambar tanda tangan Anda di kotak berikut sebelum mengajukan cuti.</p>
         <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
-            <div style="background: #fff; border: 2px dashed var(--glass-border); border-radius: 12px; width: 100%; max-width: 400px; height: 200px; overflow: hidden; position: relative;">
-                <canvas id="ttd-canvas" style="display:block; width:100%; height:100%; touch-action:none;"></canvas>
-            </div>
-            <div style="display: flex; gap: 10px;">
-                <button type="button" class="btn btn-secondary btn-sm" onclick="undoCanvas()">↩️ Undo</button>
-                <button type="button" class="btn btn-secondary btn-sm" onclick="clearCanvas()">🗑️ Hapus</button>
+            <div class="ttd-canvas-wrapper" style="width: 100%;">
+                <canvas id="ttd-canvas"></canvas>
+                <div class="ttd-actions">
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="clearCanvas()">🗑️ Hapus</button>
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="undoCanvas()">↩️ Undo</button>
+                </div>
             </div>
         </div>
     </div>
@@ -311,7 +354,7 @@ if (canvas) {
         ctx.scale(dpr, dpr);
         canvas.style.width = rect.width + 'px';
         canvas.style.height = rect.height + 'px';
-        ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#1a1a2e';
+        ctx.lineWidth = 3.5; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#1a1a2e';
         redrawPaths();
     }
     function getPos(e) {
@@ -333,7 +376,7 @@ if (canvas) {
     }
     function redrawPaths() {
         ctx.clearRect(0,0,canvas.width,canvas.height);
-        ctx.lineWidth=2.5; ctx.lineCap='round'; ctx.lineJoin='round'; ctx.strokeStyle='#1a1a2e';
+        ctx.lineWidth=3.5; ctx.lineCap='round'; ctx.lineJoin='round'; ctx.strokeStyle='#1a1a2e';
         paths.forEach(path => {
             if(path.length<2) return;
             ctx.beginPath(); ctx.moveTo(path[0].x,path[0].y);

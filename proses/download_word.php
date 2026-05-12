@@ -216,6 +216,19 @@ if ($data['jenis_pengajuan'] === 'izin') {
     $templateProcessor->setValue('nip', $data['nip']);
     $templateProcessor->setValue('jabatan', $data['jabatan']);
     $templateProcessor->setValue('golongan', $data['pangkat'] ?: '-');
+    $templateProcessor->setValue('masa_kerja', hitungMasaKerja($data['tgl_mulai_kerja'] ?? '2020-01-01'));
+    
+    // Data SK
+    if (!empty($data['nomor_sk'])) {
+        $parts = explode('/', $data['nomor_sk']);
+        $templateProcessor->setValue('n', $parts[0] ?? '');
+        $templateProcessor->setValue('BULAN_ROMAWI', $parts[count($parts)-2] ?? '');
+        $templateProcessor->setValue('TAHUN', $parts[count($parts)-1] ?? '');
+    } else {
+        $templateProcessor->setValue('n', '...');
+        $templateProcessor->setValue('BULAN_ROMAWI', '...');
+        $templateProcessor->setValue('TAHUN', date('Y'));
+    }
 
     // Hitung Masa Kerja
     $masaKerja = hitungMasaKerja($data['tgl_mulai_kerja']);

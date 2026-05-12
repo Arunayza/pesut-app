@@ -155,11 +155,21 @@ try {
     // Jika sudah memenuhi TTD → auto approve
     $butuhTtd = in_array($pengajuan['jenis_pengajuan'], ['izin', 'pulang_cepat']) ? 1 : 2;
     if ($totalTTD >= $butuhTtd) {
+        $nomorSkUpdate = "";
+        $nomorSkParam = [];
+        
+        if ($pengajuan['jenis_pengajuan'] === 'cuti') {
+            $nomorSk = generateNomorSKCuti($pdo, $pengajuan['tanggal_mulai'], $statusPegawaiPemohon);
+            $nomorSkUpdate = ", nomor_sk = ?";
+            $nomorSkParam[] = $nomorSk;
+        }
+        
+        $params = array_merge([$userId], $nomorSkParam, [$pengajuanId]);
         $stmt = $pdo->prepare("
-            UPDATE pengajuan SET status = 'disetujui', disetujui_oleh = ?, tanggal_approval = NOW()
+            UPDATE pengajuan SET status = 'disetujui', disetujui_oleh = ?, tanggal_approval = NOW() {$nomorSkUpdate}
             WHERE id = ?
         ");
-        $stmt->execute([$userId, $pengajuanId]);
+        $stmt->execute($params);
 
         $statusBaru = 'disetujui';
         $message = 'Pengajuan disetujui! Kedua pejabat telah menandatangani.';
@@ -245,6 +255,6 @@ try {
 } catch (Exception $e) {
     $pdo->rollBack();
     // Hapus file jika gagal
-    if (file_exists($filepath)) unlink($filepath);
-    echo json_encode(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+    if (isset($pathInfo['abs']) && file_exists($pathInfo['abs'])) unlink($pathInfo['abs']);
+    echo json_encode(['error' => 'Terjadi kesalahan sistem: ' . $e->getMessage()]);
 }

@@ -183,10 +183,8 @@ function canSignIzin(int $userId, string $role, ?int $atasanId): bool
 {
     // Atasan langsung
     if (!empty($atasanId) && $userId == $atasanId) return true;
-    // Pejabat struktural
-    if (isPejabatStruktural($role)) return true;
-    // Admin bisa sign juga (fallback)
-    if ($role === 'admin') return true;
+    // Hanya Ketua / Wakil Ketua (atau pejabat berwenang lainnya jika diperlukan)
+    if (in_array($role, ['ketua', 'wakil_ketua'])) return true;
 
     return false;
 }
@@ -200,8 +198,6 @@ function canReject(int $userId, string $role, ?int $atasanId, string $statusPega
     if (!empty($atasanId) && $userId == $atasanId) return true;
     // Pejabat berwenang
     if (isPejabatBerwenang($role, $statusPegawai)) return true;
-    // Admin
-    if ($role === 'admin') return true;
 
     return false;
 }

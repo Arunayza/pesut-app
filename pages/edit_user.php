@@ -37,14 +37,13 @@ $stmt = $pdo->prepare("SELECT id, nama, jabatan FROM users WHERE aktif = 1 AND i
 $stmt->execute([$id]);
 $users = $stmt->fetchAll();
 
-// Ambil data saldo cuti untuk diedit
-$saldo = cekSisaCuti($id, (int) TAHUN_AKTIF, $pdo);
+// Data saldo cuti telah dipindah ke halaman Kontrol Cuti
 
 require_once __DIR__ . '/../includes/header.php';
 require_once __DIR__ . '/../includes/sidebar.php';
 ?>
 
-<div class="card" style="max-width: 800px; margin: 0 auto;">
+<div class="card" style="width: 100%; max-width: 800px; margin: 0 auto;">
     <div class="card-header">
         <h3>✏️ Edit Pegawai</h3>
     </div>
@@ -70,7 +69,7 @@ require_once __DIR__ . '/../includes/sidebar.php';
                 </div>
             </div>
 
-            <div class="form-row cols-3">
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 16px;">
                 <div class="form-group">
                     <label for="jenis_kelamin">Jenis Kelamin <span style="color:red">*</span></label>
                     <select id="jenis_kelamin" name="jenis_kelamin" class="form-control" required>
@@ -92,7 +91,7 @@ require_once __DIR__ . '/../includes/sidebar.php';
                 </div>
             </div>
 
-            <div class="form-row">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px;">
                 <div class="form-group">
                     <label for="jabatan">Jabatan <span style="color:red">*</span></label>
                     <input type="text" id="jabatan" name="jabatan" class="form-control" required value="<?= htmlspecialchars($targetUser['jabatan']) ?>">
@@ -103,7 +102,7 @@ require_once __DIR__ . '/../includes/sidebar.php';
                 </div>
             </div>
 
-            <div class="form-row">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px;">
                 <div class="form-group">
                     <label for="role">Hak Akses (Role) <span style="color:red">*</span></label>
                     <select id="role" name="role" class="form-control" required>
@@ -135,58 +134,6 @@ require_once __DIR__ . '/../includes/sidebar.php';
                     <input type="checkbox" name="aktif" value="1" <?= $targetUser['aktif'] ? 'checked' : '' ?>>
                     <span style="font-weight: normal;">Akun Aktif (Bisa Login)</span>
                 </label>
-            </div>
-
-            <hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 24px 0;">
-
-            <h4 style="margin-bottom: 16px;">Kelola Jatah Cuti (Tahun <?= TAHUN_AKTIF ?>)</h4>
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
-                <div class="form-group">
-                    <label for="jatah_tahunan_lalu">Jatah Cuti Tahun Lalu</label>
-                    <input type="number" id="jatah_tahunan_lalu" name="jatah_tahunan_lalu" class="form-control" min="0" value="<?= $saldo['jatah_tahunan_lalu'] ?>">
-                </div>
-                <div class="form-group">
-                    <label for="jatah_tahunan">Jatah Cuti Tahunan (Tahun Ini)</label>
-                    <input type="number" id="jatah_tahunan" name="jatah_tahunan" class="form-control" min="0" value="<?= $saldo['jatah_tahunan'] ?>">
-                </div>
-                <div class="form-group">
-                    <label for="jatah_sakit">Jatah Cuti Sakit</label>
-                    <input type="number" id="jatah_sakit" name="jatah_sakit" class="form-control" min="0" value="<?= $saldo['jatah_sakit'] ?>">
-                </div>
-                <div class="form-group">
-                    <label for="jatah_alasan_penting">Jatah Cuti Alasan Penting</label>
-                    <input type="number" id="jatah_alasan_penting" name="jatah_alasan_penting" class="form-control" min="0" value="<?= $saldo['jatah_alasan_penting'] ?>">
-                </div>
-                <div class="form-group">
-                    <label for="jatah_melahirkan">Jatah Cuti Melahirkan</label>
-                    <input type="number" id="jatah_melahirkan" name="jatah_melahirkan" class="form-control" min="0" value="<?= $saldo['jatah_melahirkan'] ?>">
-                </div>
-            </div>
-
-            <hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 24px 0;">
-
-            <h4 style="margin-bottom: 16px; color: var(--orange-400);">Cuti Terpakai (Mengurangi Sisa)</h4>
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
-                <div class="form-group">
-                    <label for="terpakai_tahunan_lalu">Terpakai Tahun Lalu</label>
-                    <input type="number" id="terpakai_tahunan_lalu" name="terpakai_tahunan_lalu" class="form-control" min="0" value="<?= $saldo['terpakai_tahunan_lalu'] ?>">
-                </div>
-                <div class="form-group">
-                    <label for="terpakai_tahunan">Terpakai Tahunan (Tahun Ini)</label>
-                    <input type="number" id="terpakai_tahunan" name="terpakai_tahunan" class="form-control" min="0" value="<?= $saldo['terpakai_tahunan'] ?>">
-                </div>
-                <div class="form-group">
-                    <label for="terpakai_sakit">Terpakai Sakit</label>
-                    <input type="number" id="terpakai_sakit" name="terpakai_sakit" class="form-control" min="0" value="<?= $saldo['terpakai_sakit'] ?>">
-                </div>
-                <div class="form-group">
-                    <label for="terpakai_alasan_penting">Terpakai Alasan Penting</label>
-                    <input type="number" id="terpakai_alasan_penting" name="terpakai_alasan_penting" class="form-control" min="0" value="<?= $saldo['terpakai_alasan_penting'] ?>">
-                </div>
-                <div class="form-group">
-                    <label for="terpakai_melahirkan">Terpakai Melahirkan</label>
-                    <input type="number" id="terpakai_melahirkan" name="terpakai_melahirkan" class="form-control" min="0" value="<?= $saldo['terpakai_melahirkan'] ?>">
-                </div>
             </div>
 
             <hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 24px 0;">

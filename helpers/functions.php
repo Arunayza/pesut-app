@@ -296,6 +296,50 @@ function terbilang(int $angka): string
     } elseif ($angka < 1000000) {
         $terbilang = terbilang((int)($angka / 1000)) . " ribu" . terbilang($angka % 1000);
     }
-
+    
     return trim($terbilang);
+}
+
+/**
+ * Generate Nomor SK Cuti
+ */
+function generateNomorSKCuti(PDO $pdo, string $tanggalMulai, string $statusPegawai): string
+{
+    $bulan = (int) date('n', strtotime($tanggalMulai));
+    $tahun = (int) date('Y', strtotime($tanggalMulai));
+    
+    $romawi = [
+        1 => 'I', 2 => 'II', 3 => 'III', 4 => 'IV', 5 => 'V', 6 => 'VI',
+        7 => 'VII', 8 => 'VIII', 9 => 'IX', 10 => 'X', 11 => 'XI', 12 => 'XII'
+    ];
+    $bulanRomawi = $romawi[$bulan];
+    
+    $baseFormat = "KPTUN.W6-TUN3/KP5.3/{$bulanRomawi}/{$tahun}";
+    if ($statusPegawai === 'PPPK') {
+        $baseFormat = "SEK." . $baseFormat;
+    }
+    
+    $stmt = $pdo->prepare("
+        SELECT nomor_sk FROM pengajuan 
+        WHERE jenis_pengajuan = 'cuti' 
+          AND nomor_sk IS NOT NULL 
+          AND MONTH(tanggal_mulai) = ? 
+          AND YEAR(tanggal_mulai) = ?
+    ");
+    $stmt->execute([$bulan, $tahun]);
+    $skList = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    
+    $maxUrut = -1; 
+    foreach ($skList as $sk) {
+        $parts = explode('/', $sk);
+        if (isset($parts[0]) && is_numeric($parts[0])) {
+            $urut = (int) $parts[0];
+            if ($urut > $maxUrut) {
+                $maxUrut = $urut;
+            }
+        }
+    }
+    
+    $nextUrut = $maxUrut + 1;
+    return "{$nextUrut}/{$baseFormat}";
 }

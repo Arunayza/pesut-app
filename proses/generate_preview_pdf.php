@@ -51,6 +51,11 @@ if ($jenis === 'cuti') {
     $templateProcessor->setValue('golongan', $profil['pangkat'] ?: '-');
     $templateProcessor->setValue('masa_kerja', hitungMasaKerja($profil['tgl_mulai_kerja'] ?? '2020-01-01'));
 
+    // Data SK (Preview mode: belum digenerate)
+    $templateProcessor->setValue('n', '...');
+    $templateProcessor->setValue('BULAN_ROMAWI', '...');
+    $templateProcessor->setValue('TAHUN', date('Y'));
+
     // Data Cuti
     $templateProcessor->setValue('alasan', htmlspecialchars($data['alasan']));
     $jumlahHari = (int)$data['jumlah_hari'];

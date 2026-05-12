@@ -37,17 +37,7 @@ if ($atasanId === null) {
 $aktif = isset($_POST['aktif']) ? 1 : 0;
 $resetPassword = isset($_POST['reset_password']) ? 1 : 0;
 
-$jatah_tahunan_lalu = (int)($_POST['jatah_tahunan_lalu'] ?? 0);
-$jatah_tahunan = (int)($_POST['jatah_tahunan'] ?? 0);
-$jatah_sakit = (int)($_POST['jatah_sakit'] ?? 0);
-$jatah_alasan_penting = (int)($_POST['jatah_alasan_penting'] ?? 0);
-$jatah_melahirkan = (int)($_POST['jatah_melahirkan'] ?? 0);
-
-$terpakai_tahunan_lalu = (int)($_POST['terpakai_tahunan_lalu'] ?? 0);
-$terpakai_tahunan = (int)($_POST['terpakai_tahunan'] ?? 0);
-$terpakai_sakit = (int)($_POST['terpakai_sakit'] ?? 0);
-$terpakai_alasan_penting = (int)($_POST['terpakai_alasan_penting'] ?? 0);
-$terpakai_melahirkan = (int)($_POST['terpakai_melahirkan'] ?? 0);
+// Saldo cuti sekarang dikelola dari Kontrol Cuti
 
 if ($id <= 0) {
     setFlash('error', 'ID User tidak valid!');
@@ -88,32 +78,7 @@ try {
         $stmt->execute([$nip, $nama, $jenis_kelamin, $status_pegawai, $tgl_mulai_kerja, $jabatan, $pangkat, $role, $atasanId, $aktif, $id]);
     }
 
-    // Update Saldo Cuti
-    $tahun = (int) TAHUN_AKTIF;
-    $stmtCuti = $pdo->prepare("
-        INSERT INTO saldo_cuti (
-            user_id, tahun, 
-            jatah_tahunan_lalu, jatah_tahunan, jatah_sakit, jatah_melahirkan, jatah_alasan_penting,
-            terpakai_tahunan_lalu, terpakai_tahunan, terpakai_sakit, terpakai_melahirkan, terpakai_alasan_penting
-        )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ON DUPLICATE KEY UPDATE 
-            jatah_tahunan_lalu = VALUES(jatah_tahunan_lalu),
-            jatah_tahunan = VALUES(jatah_tahunan),
-            jatah_sakit = VALUES(jatah_sakit),
-            jatah_melahirkan = VALUES(jatah_melahirkan),
-            jatah_alasan_penting = VALUES(jatah_alasan_penting),
-            terpakai_tahunan_lalu = VALUES(terpakai_tahunan_lalu),
-            terpakai_tahunan = VALUES(terpakai_tahunan),
-            terpakai_sakit = VALUES(terpakai_sakit),
-            terpakai_melahirkan = VALUES(terpakai_melahirkan),
-            terpakai_alasan_penting = VALUES(terpakai_alasan_penting)
-    ");
-    $stmtCuti->execute([
-        $id, $tahun, 
-        $jatah_tahunan_lalu, $jatah_tahunan, $jatah_sakit, $jatah_melahirkan, $jatah_alasan_penting,
-        $terpakai_tahunan_lalu, $terpakai_tahunan, $terpakai_sakit, $terpakai_melahirkan, $terpakai_alasan_penting
-    ]);
+    // Saldo cuti dikelola melalui halaman edit_saldo_cuti secara terpisah
 
     $pdo->commit();
     setFlash('success', 'Data pegawai berhasil diperbarui!');

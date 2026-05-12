@@ -28,13 +28,13 @@ $sql = "
     SELECT p.*, u.nama, u.nip, u.jabatan, u.pangkat, u.atasan_id,
            (SELECT COUNT(*) FROM ttd_pengajuan t WHERE t.pengajuan_id = p.id) as jumlah_ttd,
            (SELECT COUNT(*) FROM ttd_pengajuan t WHERE t.pengajuan_id = p.id AND t.user_id = ?) as sudah_ttd_saya,
-           0 as sudah_ttd_kedua
+           (SELECT COUNT(*) FROM ttd_pengajuan t WHERE t.pengajuan_id = p.id AND t.user_id = ? AND t.urutan_ttd = 2) as sudah_ttd_kedua
     FROM pengajuan p
     JOIN users u ON p.user_id = u.id
     WHERE 1=1
 ";
 
-$params = [$userId];
+$params = [$userId, $userId];
 
 // Admin, Staf KPOT, Kasubbag KPOT bisa lihat semua pengajuan
 $canSeeAll = in_array($_SESSION['role'], ['admin', 'staf_kpot', 'kasubbag_kpot']);
@@ -231,6 +231,86 @@ require_once __DIR__ . '/../includes/sidebar.php';
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Mobile Cards (tampil hanya di HP) -->
+            <div class="mobile-cards">
+                <?php foreach ($pengajuan as $p): ?>
+                <div class="mobile-card" style="flex-direction: column; gap: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
+                        <div>
+                            <div class="mobile-card-nama"><?= htmlspecialchars($p['nama']) ?></div>
+                            <div class="mobile-card-jabatan">
+                                <?= htmlspecialchars($p['jabatan']) ?>
+                                <small>NIP: <?= htmlspecialchars($p['nip']) ?></small>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <?= statusBadge($p['status']) ?>
+                        </div>
+                    </div>
+                    
+                    <div style="background: rgba(0,0,0,0.02); padding: 10px; border-radius: 8px; border: 1px solid var(--glass-border);">
+                        <div style="margin-bottom: 6px;"><?= jenisBadge($p['jenis_pengajuan'], $p['tipe_izin_waktu'] ?? null) ?></div>
+                        <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.4;">
+                            <?php if ($p['jenis_pengajuan'] === 'cuti'): ?>
+                                <strong>Tanggal:</strong> <?= formatTanggal($p['tanggal_mulai']) ?> - <?= formatTanggal($p['tanggal_selesai']) ?><br>
+                                <span style="color: var(--text-muted);"><?= $p['jumlah_hari'] ?> hari kerja (<?= ucwords(str_replace('_', ' ', $p['tipe_cuti'] ?? 'tahunan')) ?>)</span>
+                            <?php elseif ($p['jenis_pengajuan'] === 'izin'): ?>
+                                <strong>Tanggal:</strong> <?= formatTanggal($p['tanggal_mulai']) ?><br>
+                                <span style="color: var(--text-muted);">Jam: <?= substr($p['jam_mulai'] ?? '00:00', 0, 5) ?> - <?= substr($p['jam_selesai'] ?? '00:00', 0, 5) ?></span>
+                            <?php else: ?>
+                                <strong>Tanggal:</strong> <?= formatTanggal($p['tanggal_pulang']) ?><br>
+                                <span style="color: var(--text-muted);">
+                                    <?php if (($p['tipe_izin_waktu'] ?? '') === 'datang_terlambat'): ?>
+                                        Datang: <?= substr($p['jam_pulang_diajukan'] ?? '', 0, 5) ?> (Resmi: <?= substr($p['jam_pulang_resmi'] ?? '', 0, 5) ?>)
+                                    <?php else: ?>
+                                        Pulang: <?= substr($p['jam_pulang_diajukan'] ?? '', 0, 5) ?> (Resmi: <?= substr($p['jam_pulang_resmi'] ?? '', 0, 5) ?>)
+                                    <?php endif; ?>
+                                </span>
+                            <?php endif; ?>
+                        </div>
+                        <div style="font-size: 12px; color: var(--text-primary); margin-top: 6px; font-style: italic;">
+                            "<?= htmlspecialchars($p['alasan']) ?>"
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 8px;">
+                        <div style="font-size: 11px; color: var(--text-muted);">
+                            <?php
+                            $ttdCount = (int) $p['jumlah_ttd'];
+                            $butuhTtd = in_array($p['jenis_pengajuan'], ['izin', 'pulang_cepat']) ? 1 : 2;
+                            if ($ttdCount >= $butuhTtd): echo "<span style='color:var(--green-400);'>✅ TTD Lengkap</span>";
+                            elseif ($ttdCount > 0): echo "<span style='color:var(--orange-400);'>⏳ $ttdCount/$butuhTtd TTD</span>";
+                            else: echo "⏳ 0/$butuhTtd TTD"; endif;
+                            ?>
+                        </div>
+                        <div style="display: flex; gap: 6px;">
+                            <?php if ($p['status'] === 'pending'): ?>
+                                <?php
+                                $bisakTtdLagi = false;
+                                if ($p['sudah_ttd_saya'] && $p['jenis_pengajuan'] === 'cuti') {
+                                    $stmtStatusP = $pdo->prepare("SELECT status_pegawai FROM users WHERE id = ?");
+                                    $stmtStatusP->execute([$p['user_id']]);
+                                    $spP = $stmtStatusP->fetchColumn() ?: 'PNS';
+                                    if (!$p['sudah_ttd_kedua'] && (int)$p['jumlah_ttd'] === 1 && $userId == $p['atasan_id'] && isPejabatBerwenang($_SESSION['role'], $spP)) {
+                                        $bisakTtdLagi = true;
+                                    }
+                                }
+                                ?>
+                                <?php if (!$p['sudah_ttd_saya'] || $bisakTtdLagi): ?>
+                                    <a href="<?= BASE_URL ?>/pages/review_pengajuan.php?id=<?= $p['id'] ?>" class="btn btn-primary btn-sm">✍️ Review</a>
+                                <?php else: ?>
+                                    <span class="badge badge-success">✅ TTD</span>
+                                <?php endif; ?>
+                                <button class="btn btn-danger btn-sm" onclick="openTolakModal(<?= $p['id'] ?>)">✗ Tolak</button>
+                            <?php elseif ($p['status'] === 'disetujui'): ?>
+                                <a href="<?= BASE_URL ?>/proses/download_surat.php?id=<?= $p['id'] ?>" class="btn btn-secondary btn-sm" target="_blank">📥 PDF</a>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+                <?php endforeach; ?>
             </div>
         <?php endif; ?>
     </div>

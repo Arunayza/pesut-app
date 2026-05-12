@@ -103,7 +103,16 @@ require_once __DIR__ . '/../includes/sidebar.php';
 <a href="<?= BASE_URL ?>/dashboard_v2.php" class="btn-back-dashboard" style="display: inline-flex; align-items: center; gap: 6px; color: var(--text-muted); text-decoration: none; font-size: 13px; font-weight: 600; margin-bottom: 16px; padding: 6px 14px; border-radius: 8px; transition: all 0.2s; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.03);">
     ← Kembali ke Dashboard
 </a>
-<div class="form-card">
+<div class="form-card" style="margin-bottom: 20px;">
+    <style>
+    @media (max-width: 600px) {
+        .form-card { border-radius: 12px; border-left: none; border-right: none; }
+        .form-card-body { padding: 16px; }
+        .form-card-header { padding: 16px; }
+        .form-submit-area { flex-direction: column; }
+        .form-submit-area .btn { width: 100%; justify-content: center; }
+    }
+    </style>
     <div class="form-card-header">
         <div class="form-card-header-icon">📝</div>
         <div>
@@ -149,7 +158,6 @@ require_once __DIR__ . '/../includes/sidebar.php';
                     <div class="form-group">
                         <label for="jam_selesai">⏰ Jam Kembali</label>
                         <input type="time" id="jam_selesai" name="jam_selesai" class="form-control" required>
-                    </div>
                     </div>
                 </div>
                 

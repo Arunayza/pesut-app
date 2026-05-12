@@ -58,7 +58,7 @@ if ($data['status'] !== 'pending') {
             if (canSignIzin($userId, $userRole, $data['requester_atasan_id'])) {
                 $berhakTtd = true;
             } else {
-                $alasanTidakBerhak = 'Pengajuan izin hanya dapat ditandatangani oleh Atasan Langsung atau Pejabat Struktural.';
+                $alasanTidakBerhak = 'Pengajuan izin hanya dapat ditandatangani oleh Atasan Langsung atau Ketua/Wakil Ketua.';
             }
         }
     } else {
@@ -118,7 +118,7 @@ require_once __DIR__ . '/../includes/sidebar.php';
     ← Kembali ke Daftar
 </a>
 
-<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+<div class="review-container">
     <!-- Detail Pengajuan -->
     <div class="card">
         <div class="card-header">
@@ -305,6 +305,11 @@ require_once __DIR__ . '/../includes/sidebar.php';
 </div>
 
 <style>
+.review-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
 .detail-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -355,6 +360,9 @@ require_once __DIR__ . '/../includes/sidebar.php';
 }
 @media (max-width: 768px) {
     .detail-grid {
+        grid-template-columns: 1fr;
+    }
+    .review-container {
         grid-template-columns: 1fr;
     }
 }

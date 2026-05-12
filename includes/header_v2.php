@@ -17,8 +17,9 @@ if (!isset($showPending)) {
         <?php if ($showPending || $_SESSION['role'] === 'admin'): ?>
             <a href="<?= BASE_URL ?>/pages/kelola_pengajuan.php" class="mobile-nav-link"><span style="display:inline-block; width: 24px; text-align: center;">📌</span> Kelola Pengajuan</a>
         <?php endif; ?>
-        <?php if (in_array($_SESSION['role'], ['admin', 'staf_kpot'])): ?>
+        <?php if (in_array($_SESSION['role'], ['admin', 'staf_kpot', 'kepegawaian'])): ?>
             <a href="<?= BASE_URL ?>/pages/kelola_user.php" class="mobile-nav-link"><span style="display:inline-block; width: 24px; text-align: center;">👥</span> Kelola Pegawai</a>
+            <a href="<?= BASE_URL ?>/pages/kontrol_cuti.php" class="mobile-nav-link"><span style="display:inline-block; width: 24px; text-align: center;">📊</span> Kontrol Cuti</a>
         <?php endif; ?>
         <a href="<?= BASE_URL ?>/pages/riwayat.php" class="mobile-nav-link"><span style="display:inline-block; width: 24px; text-align: center;">📄</span> Riwayat Pengajuan</a>
     </div>
@@ -65,8 +66,9 @@ if (!isset($showPending)) {
             <?php if ($showPending || $_SESSION['role'] === 'admin'): ?>
                 <a href="<?= BASE_URL ?>/pages/kelola_pengajuan.php" class="nav-link-v2 <?= $currentPage === 'kelola_pengajuan.php' ? 'active' : '' ?>">Kelola</a>
             <?php endif; ?>
-            <?php if (in_array($_SESSION['role'], ['admin', 'staf_kpot'])): ?>
-                <a href="<?= BASE_URL ?>/pages/kelola_user.php" class="nav-link-v2 <?= $currentPage === 'kelola_user.php' || $currentPage === 'tambah_user.php' ? 'active' : '' ?>">Pegawai</a>
+            <?php if (in_array($_SESSION['role'], ['admin', 'staf_kpot', 'kepegawaian'])): ?>
+                <a href="<?= BASE_URL ?>/pages/kelola_user.php" class="nav-link-v2 <?= in_array($currentPage, ['kelola_user.php', 'tambah_user.php', 'edit_user.php']) ? 'active' : '' ?>">Pegawai</a>
+                <a href="<?= BASE_URL ?>/pages/kontrol_cuti.php" class="nav-link-v2 <?= in_array($currentPage, ['kontrol_cuti.php', 'edit_saldo_cuti.php']) ? 'active' : '' ?>">Kontrol Cuti</a>
             <?php endif; ?>
             <a href="<?= BASE_URL ?>/pages/riwayat.php" class="nav-link-v2 <?= $currentPage === 'riwayat.php' ? 'active' : '' ?>">Riwayat</a>
         </div>
