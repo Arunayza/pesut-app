@@ -43,8 +43,9 @@ function hitungHariKerja(string $mulai, string $selesai, PDO $pdo, bool $returnD
  * Dapatkan jam pulang resmi berdasarkan tanggal
  * Senin-Kamis: 16:30, Jumat: 17:00
  */
-function getJamPulangResmi(string $tanggal): string
+function getJamPulangResmi(?string $tanggal): string
 {
+    if (empty($tanggal)) return JAM_PULANG_SENIN_KAMIS;
     $dayOfWeek = (int) (new DateTime($tanggal))->format('N');
 
     if ($dayOfWeek === 5) {
@@ -148,8 +149,9 @@ function cekSisaCuti(int $userId, int $tahun, PDO $pdo): array
 /**
  * Cek apakah tanggal adalah hari kerja (bukan weekend & bukan libur)
  */
-function isHariKerja(string $tanggal, PDO $pdo): bool
+function isHariKerja(?string $tanggal, PDO $pdo): bool
 {
+    if (empty($tanggal)) return false;
     $dayOfWeek = (int) (new DateTime($tanggal))->format('N');
     if ($dayOfWeek >= 6) return false; // Weekend
 
@@ -161,8 +163,9 @@ function isHariKerja(string $tanggal, PDO $pdo): bool
 /**
  * Nama hari dalam Bahasa Indonesia
  */
-function namaHari(string $tanggal): string
+function namaHari(?string $tanggal): string
 {
+    if (empty($tanggal)) return '';
     $hari = ['', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
     $dayOfWeek = (int) (new DateTime($tanggal))->format('N');
     return $hari[$dayOfWeek];
@@ -171,8 +174,9 @@ function namaHari(string $tanggal): string
 /**
  * Format tanggal ke format Indonesia
  */
-function formatTanggal(string $tanggal): string
+function formatTanggal(?string $tanggal): string
 {
+    if (empty($tanggal)) return '-';
     $bulan = [
         1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
         5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
@@ -189,8 +193,9 @@ function formatTanggal(string $tanggal): string
  * Format tanggal ke format Indonesia dengan nama hari
  * Contoh: "Selasa, 28 April 2026"
  */
-function formatTanggalHari(string $tanggal): string
+function formatTanggalHari(?string $tanggal): string
 {
+    if (empty($tanggal)) return '-';
     return namaHari($tanggal) . ', ' . formatTanggal($tanggal);
 }
 

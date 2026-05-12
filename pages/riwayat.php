@@ -173,11 +173,11 @@ require_once __DIR__ . '/../includes/sidebar.php';
                                     <?= formatTanggal($p['tanggal_pulang']) ?>
                                     <br><small style="color: var(--text-muted);">
                                         <?php if (($p['tipe_izin_waktu'] ?? '') === 'datang_terlambat'): ?>
-                                            Datang: <?= substr($p['jam_pulang_diajukan'], 0, 5) ?> 
-                                            (Resmi: <?= substr($p['jam_pulang_resmi'], 0, 5) ?>)
+                                            Datang: <?= substr($p['jam_pulang_diajukan'] ?? '', 0, 5) ?> 
+                                            (Resmi: <?= substr($p['jam_pulang_resmi'] ?? '', 0, 5) ?>)
                                         <?php else: ?>
-                                            Pulang: <?= substr($p['jam_pulang_diajukan'], 0, 5) ?> 
-                                            (Resmi: <?= substr($p['jam_pulang_resmi'], 0, 5) ?>)
+                                            Pulang: <?= substr($p['jam_pulang_diajukan'] ?? '', 0, 5) ?> 
+                                            (Resmi: <?= substr($p['jam_pulang_resmi'] ?? '', 0, 5) ?>)
                                         <?php endif; ?>
                                         — Selisih: <?= formatSelisihWaktu($p['selisih_menit']) ?>
                                     </small>

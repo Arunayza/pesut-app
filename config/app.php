@@ -14,6 +14,6 @@ define('JAM_PULANG_JUMAT', '17:00');
 
 define('KUOTA_CUTI_DEFAULT', 12);
 define('TAHUN_AKTIF', date('Y'));
-define('BASE_URL', '/pesut');
+define('BASE_URL', 'https://pesut-ptun-samarinda.fwh.is');
 
 date_default_timezone_set('Asia/Makassar');
