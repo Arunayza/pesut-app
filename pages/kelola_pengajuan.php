@@ -28,13 +28,13 @@ $sql = "
     SELECT p.*, u.nama, u.nip, u.jabatan, u.pangkat, u.atasan_id,
            (SELECT COUNT(*) FROM ttd_pengajuan t WHERE t.pengajuan_id = p.id) as jumlah_ttd,
            (SELECT COUNT(*) FROM ttd_pengajuan t WHERE t.pengajuan_id = p.id AND t.user_id = ?) as sudah_ttd_saya,
-           (SELECT COUNT(*) FROM ttd_pengajuan t WHERE t.pengajuan_id = p.id AND t.user_id = ? AND t.urutan_ttd = 2) as sudah_ttd_kedua
+           0 as sudah_ttd_kedua
     FROM pengajuan p
     JOIN users u ON p.user_id = u.id
     WHERE 1=1
 ";
 
-$params = [$userId, $userId];
+$params = [$userId];
 
 // Admin, Staf KPOT, Kasubbag KPOT bisa lihat semua pengajuan
 $canSeeAll = in_array($_SESSION['role'], ['admin', 'staf_kpot', 'kasubbag_kpot']);
